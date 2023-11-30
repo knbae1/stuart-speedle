@@ -1,5 +1,7 @@
 # mms-cpp
 
+testtest
+
 Write a Micromouse maze-solving algorithm in C++.
 
 For use with [mackorone/mms](https://github.com/mackorone/mms), a Micromouse simulator.
@@ -11,7 +13,7 @@ For use with [mackorone/mms](https://github.com/mackorone/mms), a Micromouse sim
 1. Run the simulator and click the "+" button to configure a new algorithm
 1. Enter the config for your algorithm (name, directory, build command, and run command)
 1. Click the "Run" button
- OOG
+
 ## Examples
 
 Windows:
