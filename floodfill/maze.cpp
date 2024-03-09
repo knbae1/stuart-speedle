@@ -1,6 +1,6 @@
 #include "maze.h"
 
-Cells* Maze::getNeighborCells() {
+Cell* Maze::getNeighborCells() {
 
 
 }

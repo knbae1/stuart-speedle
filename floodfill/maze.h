@@ -37,7 +37,7 @@ class Maze
     Coord * goalPos;
 
     //differentiate bt accessible and blocked cells
-    Cells* getNeighborCells();
+    Cell* getNeighborCells();
     //returns best accessible cell for mouse to move to
     Cell getBestCell();
 
