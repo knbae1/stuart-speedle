@@ -6,7 +6,7 @@
 void log(const std::string& text) {
     std::cerr << text << std::endl;
 }
-/*this is a comment meant to test how to commit*/
+/*this is a cot*/
 enum Direction {
     NORTH = 0,
     EAST = 1,
