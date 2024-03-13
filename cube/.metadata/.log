@@ -98,3 +98,24 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2024-03-13 13:30:42.396
 !MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2024-03-13 14:04:24.458 -----------------------------------------------
+eclipse.buildId=Version 1.14.1
+java.version=17.0.8.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2024-03-13 14:05:07.989
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2024-03-13 14:05:07.997
+!MESSAGE Log4j2 initialized with config file C:\Users\AnthonyRamirez\stuart-speedle\cube\.metadata\.log4j2.xml
+
+!ENTRY org.eclipse.e4.ui.workbench 2 0 2024-03-13 14:05:10.413
+!MESSAGE Removing PartDescriptorImpl with the "org.eclipse.ui.views.ResourceNavigator" id and the "Navigator (Deprecated)" label.It points to the non available "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" class. Bundle might have been uninstalled
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2024-03-13 14:05:12.299
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2024-03-13 14:06:19.457
+!MESSAGE Indexed 'mm_test' (21 sources, 82 headers) in 2.61 sec: 5,171 declarations; 34,321 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0051%)
