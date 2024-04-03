@@ -2,6 +2,7 @@
 #include <string>
 
 #include "API.h"
+#include "maze.h"
 
 void log(const std::string& text) {
     std::cerr << text << std::endl;
@@ -14,7 +15,6 @@ enum Direction {
     WEST = 3
 };
 
-char dir_chars[4] = {'n', 'e', 's', 'w'};
 
 //initial values
 int x =0;
@@ -22,7 +22,7 @@ int y = 0;
 Direction dir = NORTH;
 
 int main(int argc, char* argv[]) {
-    
+    Maze m;
     //log("Running...");
     std::cerr << NORTH << std::endl;
     API::setColor(0, 0, 'G');
@@ -34,11 +34,11 @@ int main(int argc, char* argv[]) {
         std::cerr << dir << "(" << x << ", " << y << ")" << std::endl;
         //std::cerr << dir_chars[dir] << std::endl;
         if (!API::wallLeft()) {
-            API::turnLeft();
-            dir = Direction((dir + 3)%4);  
+            
+            m.ccw_step();
         }
         while (API::wallFront()) {
-            API::turnRight();
+            m.cw_step();
             dir = Direction((dir + 1)%4);  
 
         }
