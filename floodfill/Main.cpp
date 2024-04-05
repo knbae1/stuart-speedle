@@ -17,9 +17,6 @@ enum Direction {
 
 
 //initial values
-int x =0;
-int y = 0;
-Direction dir = NORTH;
 
 int main(int argc, char* argv[]) {
     Maze m;
@@ -30,37 +27,24 @@ int main(int argc, char* argv[]) {
 
     API::setWall(0,0,'w');
     API::setWall(0,0, 's');
+    //scan walls and calculate distance
     while (true) {
-        std::cerr << dir << "(" << x << ", " << y << ")" << std::endl;
+        Direction d = m.dir();
+        std::cerr << d << "(" << 0 << ", " << 0 << ")" << std::endl;
         //std::cerr << dir_chars[dir] << std::endl;
+        m.scanWalls();
         if (!API::wallLeft()) {
             
             m.ccw_step();
         }
         while (API::wallFront()) {
             m.cw_step();
-            dir = Direction((dir + 1)%4);  
+            d = Direction((d + 1)%4);  
 
         }
-        API::moveForward();
+        m.move();
+       
 
-        if (dir == NORTH) y++;
-        
-        if (dir == SOUTH) y--;
-        if (dir == WEST) x--;
-        if (dir == EAST) x++;
-
-        if (API::wallFront()) 
-        {
-            API::setWall(x, y, dir_chars[dir]);
-        }
-        if (API::wallRight()) 
-        {
-            API::setWall(x, y, dir_chars[(dir+1)%4]);
-        }
-        if (API::wallLeft()) 
-        {
-            API::setWall(x, y, dir_chars[(dir+3)%4]);
-        }
+       
     }
 }

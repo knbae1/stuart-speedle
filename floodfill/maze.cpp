@@ -1,18 +1,22 @@
 #include "maze.h"
+#include <array>
 
 
-
-Cell* Maze::getNeighborCells() {
+Cell* getNeighborCells(Coord c) {
 
 
 }
 
-Cell Maze::getBestCell() {
+Cell getBestCell() {
     //investigate distances (this is matrix of mannhatten distances to the goal cell)
-    int a,b,c,d
+    //check if wall is blocking cell
+    int a{distances[mousePos.y][mousePos.x]};
+    int a{distances[mousePos.y][mousePos.x]};
+    int a{distances[mousePos.y][mousePos.x]};
+    int a{distances[mousePos.y][mousePos.x]};
 }
 
-Direction Maze::cw_step() {
+Direction cw_step() {
     if (mouseDir == 3) {
 			mouseDir = NORTH;
 			
@@ -23,7 +27,7 @@ Direction Maze::cw_step() {
 		
 }
 
-Direction Maze::ccw_step() {
+Direction ccw_step() {
     if (mouseDir==0) {
 			mouseDir = WEST;
 		}	else mouseDir = (Direction)((mouseDir + 1) % 4);
@@ -31,20 +35,21 @@ Direction Maze::ccw_step() {
 	return mouseDir;
 }
 
-void Maze::setGoalCell() {
+void setGoalCell() {
 
 }
 
-void Maze::rotate() {
+void rotate() {
 
 }
 
-void Maze::move() {
-
+void move() {
+    API::moveForward();
+    updatePos();
 }
 
-void Maze::updateSimulator() {
-    Maze::scanWalls();
+void updateSimulator() {
+    scanWalls();
     for (int y = 0; y < 16; ++y) {
         for (int x = 0; x < 16; ++x) {
             API::setText(x, y, std::to_string(distances[y][x]));
@@ -66,7 +71,7 @@ void Maze::updateSimulator() {
     }
 }
 
-void Maze::scanWalls() {
+void scanWalls() {
     if (API::wallFront()) {
         cellWalls[mousePos.y][mousePos.x] |= mouseDir;
     }
@@ -78,6 +83,59 @@ void Maze::scanWalls() {
     }
 }
 
-void Maze::update_mousePos(){
+void updatePos(){
+    if (mouseDir == NORTH)
+            mousePos.y++;
+        if (mouseDir == SOUTH)
+            mousePos.y--;
+        if (mouseDir == WEST)
+            mousePos.x--;
+        if (mouseDir == EAST)
+            mousePos.x++;
+    std::cerr << "inside function: (" << mousePos.x << ", " << mousePos.y << ")" << std::endl;
+
+}
+
+Direction dir() const {
+    return mouseDir;
+}
+
+
+void floodfill() {
+    Coord queue[255];
+    int h{0}, t{0};
+
+    //resetting to max cost
+    for (int y=0; y < 16; ++y) {
+        for (int x=0; x<16; ++x) {
+            //check if wall,
+            distances[x][y] = abs(goalPos->x - mousePos.x) + abs(goalPos->y - mousePos.y);
+        }
+    }
+    //set goal cell distances to 0
+    distances[7][7] = 0;
+    distances[7][8] = 0;
+    distances[8][7] = 0;
+    distances[8][8] = 0;
+
+    queue[0] = Coord{7,7};
+    queue[1] = Coord{7,8};
+    queue[2] = Coord{8,7};
+    queue[3] = Coord{8,8};
+    t = 4;
+
+    while(t - h > 0) {
+        Coord cur_pos = queue[h];
+        ++h;
+        int newcost = distances[cur_pos.y][cur_pos.x] +1;
+        Cell *neighborCells = getNeighborCells(cur_pos);
+        for (Cell c : *neighborCells) {
+            if (!c.blocked) {
+                if(distances[cell.y][cell.x]>newcost) {
+                    distances
+                }
+            }
+        }
+    }
 
 }

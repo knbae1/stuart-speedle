@@ -40,7 +40,7 @@ struct CellList {
     int size;
     Cell *cells;
 };
-class Maze 
+struct Maze 
 {
     Coord mousePos{0,0};
     Direction mouseDir{NORTH};
@@ -50,9 +50,9 @@ class Maze
     bool verticalWalls[16][17];
     bool horizontalWalls[17][16];
     Coord * goalPos;
-public:
+};
     //differentiate bt accessible and blocked cells
-    Cell* getNeighborCells();
+    Cell* getNeighborCells(Coord c);
     //returns best accessible cell for mouse to move to
     Cell getBestCell();
 
@@ -68,11 +68,16 @@ public:
     // only updates the simulator
     void updateSimulator();
 
-    //after having moved a step?963
-    void update_mousePos();
+    //after having moved a step?, if called api move forward
+    void updatePos();
     
+    //same thing as update walls
     void scanWalls();
-};
+    Direction dir() const;
+
+    //updates distances based on new scanned walls
+    void floodfill();
+
 
 
 
