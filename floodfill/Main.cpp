@@ -15,7 +15,7 @@ enum Direction {
     WEST = 3
 };
 
-
+//k
 //initial values
 
 int main(int argc, char* argv[]) {

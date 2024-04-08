@@ -1,5 +1,6 @@
 #include "maze.h"
 #include <array>
+//added to kristen branch
 
 
 Cell* getNeighborCells(Coord c) {

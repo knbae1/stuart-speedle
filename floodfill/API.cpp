@@ -37,7 +37,7 @@ bool API::wallLeft() {
     std::cin >> response;
     return response == "true";
 }
-
+//k
 void API::moveForward(int distance) {
     std::cout << "moveForward ";
     // Don't print distance argument unless explicitly specified, for
