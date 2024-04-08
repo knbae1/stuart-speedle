@@ -17,7 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"  /*this is a comment*/
+#include "main.h"  /*this is a new comment*/
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
