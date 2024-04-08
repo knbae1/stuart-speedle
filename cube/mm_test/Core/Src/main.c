@@ -1,6 +1,4 @@
-/* USER CODE BEGIN Header, THIS IS A TEST COMMENT  */
-/*this is  new comment*/
-/*this is another comment to test git pull and stash*/
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c

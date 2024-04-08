@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define MR_PWM_Pin GPIO_PIN_2
+#define MR_PWM_GPIO_Port GPIOA
+#define ML_PWM_Pin GPIO_PIN_3
+#define ML_PWM_GPIO_Port GPIOA
 #define RECIV_FR_Pin GPIO_PIN_4
 #define RECIV_FR_GPIO_Port GPIOA
 #define RECIV_R_Pin GPIO_PIN_5
@@ -79,6 +83,10 @@ void Error_Handler(void);
 #define EMIT_FR_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+//Left motor FWD
+
+
+//Right motor FWD
 
 /* USER CODE END Private defines */
 
