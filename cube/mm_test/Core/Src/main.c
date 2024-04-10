@@ -54,7 +54,6 @@ static void MX_GPIO_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
-//added a comment
 
 /* USER CODE END PFP */
 
