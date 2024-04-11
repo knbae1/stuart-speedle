@@ -69,6 +69,8 @@ void Error_Handler(void);
 #define RECIV_L_GPIO_Port GPIOB
 #define RECIV_FL_Pin GPIO_PIN_1
 #define RECIV_FL_GPIO_Port GPIOB
+#define EMIT_2_Pin GPIO_PIN_11
+#define EMIT_2_GPIO_Port GPIOB
 #define EMIT_FL_Pin GPIO_PIN_12
 #define EMIT_FL_GPIO_Port GPIOB
 #define MR_FWD_Pin GPIO_PIN_13
