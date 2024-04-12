@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -64,6 +65,24 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+uint32_t enc_left = 0;
+uint32_t enc_right = 0;
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+	// this is the left encoder timer
+	/*if (htim->Instance == TIM3) {
+		enc_left = __HAL_TIM_GET_COUNTER(htim);
+}*/
+	if (htim->Instance == TIM3) {
+		enc_left = __HAL_TIM_GET_COUNTER(htim);
+	}
+	if (htim->Instance == TIM4) {
+		enc_right = __HAL_TIM_GET_COUNTER(htim);
+	}
+
+}
+
+
 /* USER CODE END 0 */
 
 /**
@@ -100,7 +119,11 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
+  HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
 
+
+  printf("started encoder?");
   /* USER CODE END 2 */
 
   /* Infinite loop */
