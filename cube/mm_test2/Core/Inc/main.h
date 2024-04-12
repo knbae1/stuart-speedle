@@ -67,6 +67,10 @@ void Error_Handler(void);
 #define RECIV_FR_GPIO_Port GPIOA
 #define RECIV_R_Pin GPIO_PIN_5
 #define RECIV_R_GPIO_Port GPIOA
+#define ML_ENC_A_Pin GPIO_PIN_6
+#define ML_ENC_A_GPIO_Port GPIOA
+#define ML_ENC_B_Pin GPIO_PIN_7
+#define ML_ENC_B_GPIO_Port GPIOA
 #define RECIV_L_Pin GPIO_PIN_0
 #define RECIV_L_GPIO_Port GPIOB
 #define RECIV_FL_Pin GPIO_PIN_1
@@ -85,6 +89,10 @@ void Error_Handler(void);
 #define ML_FWD_GPIO_Port GPIOA
 #define EMIT_FR_Pin GPIO_PIN_5
 #define EMIT_FR_GPIO_Port GPIOB
+#define MR_ENC_B_Pin GPIO_PIN_6
+#define MR_ENC_B_GPIO_Port GPIOB
+#define MR_ENC_A_Pin GPIO_PIN_7
+#define MR_ENC_A_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
