@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -83,6 +82,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 }
 
 
+
 /* USER CODE END 0 */
 
 /**
@@ -122,16 +122,44 @@ int main(void)
   HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
   HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
 
-
-  printf("started encoder?");
+ // printf("started encoder?");
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
+	  //fwd
+	  HAL_GPIO_WritePin(GPIOA, 8, 1); // ml fwd high
+	  HAL_GPIO_WritePin(GPIOB, 14, 0);	//mlbwd low
+	  TIM2->CCR4 = 1024;
 
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+	  //HAL_Delay(3000);
+/*
+	  //bwd
+	  HAL_GPIO_WritePin(GPIOA, 8, 0);
+	  HAL_GPIO_WritePin(GPIOB, 14, 1);
+	  TIM2 ->CCR4 = 1024;
+
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+	  HAL_Delay(3000);
+
+	  //fwd right
+	  HAL_GPIO_WritePin(GPIOB, 13, 1); //mr fwd high
+	  HAL_GPIO_WritePin(GPIOB, 15, 0);
+
+	  TIM2 ->CCR3 = 1024;
+
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+	  HAL_Delay(3000);
+
+	  HAL_GPIO_WritePin(GPIOB, 13, 0); //mr fwd low
+	  HAL_GPIO_WritePin(GPIOB, 15, 1); //mr bwd high
+	  TIM2 ->CCR3 = 1024;
+
+	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+	  HAL_Delay(3000);*/
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -250,9 +278,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 1000;
+  htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 36000;
+  htim2.Init.Period = 2047;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -275,10 +303,14 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 25;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -408,8 +440,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, EMIT_2_Pin|EMIT_FL_Pin|MR_FWD_Pin|ML_BWD_Pin
-                          |MR_BWD_Pin|EMIT_FR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, EMIT_R_Pin|EMIT_L_Pin|EMIT_FL_Pin|MR_FWD_Pin
+                          |ML_BWD_Pin|MR_BWD_Pin|EMIT_FR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, GPIO_PIN_RESET);
@@ -421,10 +453,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : EMIT_2_Pin EMIT_FL_Pin MR_FWD_Pin ML_BWD_Pin
-                           MR_BWD_Pin EMIT_FR_Pin */
-  GPIO_InitStruct.Pin = EMIT_2_Pin|EMIT_FL_Pin|MR_FWD_Pin|ML_BWD_Pin
-                          |MR_BWD_Pin|EMIT_FR_Pin;
+  /*Configure GPIO pins : EMIT_R_Pin EMIT_L_Pin EMIT_FL_Pin MR_FWD_Pin
+                           ML_BWD_Pin MR_BWD_Pin EMIT_FR_Pin */
+  GPIO_InitStruct.Pin = EMIT_R_Pin|EMIT_L_Pin|EMIT_FL_Pin|MR_FWD_Pin
+                          |ML_BWD_Pin|MR_BWD_Pin|EMIT_FR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
