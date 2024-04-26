@@ -65,8 +65,8 @@ static void MX_TIM3_Init(void);
 /* USER CODE BEGIN 0 */
 
 
-uint32_t enc_left = 0;
-uint32_t enc_right = 0;
+uint16_t enc_left = 0;
+uint16_t enc_right = 0;
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// this is the left encoder timer
 	/*if (htim->Instance == TIM3) {
@@ -121,30 +121,31 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
   HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+  TIM2->CCR4 = 1500;
 
  // printf("started encoder?");
   /* USER CODE END 2 */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   while (1)
   {
     /* USER CODE END WHILE */
 	  //fwd
 	  HAL_GPIO_WritePin(GPIOA, 8, 1); // ml fwd high
 	  HAL_GPIO_WritePin(GPIOB, 14, 0);	//mlbwd low
-	  TIM2->CCR4 = 1024;
 
-	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
-	  //HAL_Delay(3000);
-/*
+	  HAL_Delay(3000);
+
 	  //bwd
 	  HAL_GPIO_WritePin(GPIOA, 8, 0);
 	  HAL_GPIO_WritePin(GPIOB, 14, 1);
-	  TIM2 ->CCR4 = 1024;
+	 // TIM2 ->CCR4 = 1024;
 
-	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+	 // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
 	  HAL_Delay(3000);
-
+/*
 	  //fwd right
 	  HAL_GPIO_WritePin(GPIOB, 13, 1); //mr fwd high
 	  HAL_GPIO_WritePin(GPIOB, 15, 0);
