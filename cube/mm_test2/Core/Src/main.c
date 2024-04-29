@@ -81,7 +81,27 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 }
 
+void move_motor()
+{
+	  TIM2->CCR4 = 1300;
+	  TIM2 ->CCR3 = 1300;
 
+	  HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 1); // ml fwd high
+	  HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 0);	//mlbwd low
+
+	  HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 1); //mr fwd high
+	  HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 0);
+	  HAL_Delay(3000);
+	  //bwd
+	  HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
+	  HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 1);	//mlbwd low
+
+	  HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 0); //mr fwd high
+	  HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 1);
+
+	  HAL_Delay(3000);
+
+}
 
 /* USER CODE END 0 */
 
@@ -119,48 +139,24 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
-  HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
-  TIM2->CCR4 = 1500;
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
+  HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
 
- // printf("started encoder?");
+
   /* USER CODE END 2 */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
   while (1)
   {
-    /* USER CODE END WHILE */
-	  //fwd
-	  HAL_GPIO_WritePin(GPIOA, 8, 1); // ml fwd high
-	  HAL_GPIO_WritePin(GPIOB, 14, 0);	//mlbwd low
+	  move_motor();
 
-	  HAL_Delay(3000);
+	/* USER CODE END WHILE */
 
-	  //bwd
-	  HAL_GPIO_WritePin(GPIOA, 8, 0);
-	  HAL_GPIO_WritePin(GPIOB, 14, 1);
-	 // TIM2 ->CCR4 = 1024;
 
-	 // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
-	  HAL_Delay(3000);
-/*
-	  //fwd right
-	  HAL_GPIO_WritePin(GPIOB, 13, 1); //mr fwd high
-	  HAL_GPIO_WritePin(GPIOB, 15, 0);
 
-	  TIM2 ->CCR3 = 1024;
-
-	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
-	  HAL_Delay(3000);
-
-	  HAL_GPIO_WritePin(GPIOB, 13, 0); //mr fwd low
-	  HAL_GPIO_WritePin(GPIOB, 15, 1); //mr bwd high
-	  TIM2 ->CCR3 = 1024;
-
-	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
-	  HAL_Delay(3000);*/
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -271,7 +267,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  //TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
@@ -284,19 +280,11 @@ static void MX_TIM2_Init(void)
   htim2.Init.Period = 2047;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
   if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
   }
+
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
@@ -304,7 +292,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 25;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
@@ -432,13 +420,13 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
+  //__HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, EMIT_R_Pin|EMIT_L_Pin|EMIT_FL_Pin|MR_FWD_Pin
@@ -448,11 +436,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  //GPIO_InitStruct.Pin = GPIO_PIN_13;
+  //GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  //GPIO_InitStruct.Pull = GPIO_NOPULL;
+  //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  //HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : EMIT_R_Pin EMIT_L_Pin EMIT_FL_Pin MR_FWD_Pin
                            ML_BWD_Pin MR_BWD_Pin EMIT_FR_Pin */
