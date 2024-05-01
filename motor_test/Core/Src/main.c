@@ -228,14 +228,24 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, MR_FWD_Pin|ML_BWD_Pin|MR_BWD_Pin|ML_FWD_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, EMIT_FL_Pin|MR_FWD_Pin|ML_BWD_Pin|MR_BWD_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : MR_FWD_Pin ML_BWD_Pin MR_BWD_Pin ML_FWD_Pin */
-  GPIO_InitStruct.Pin = MR_FWD_Pin|ML_BWD_Pin|MR_BWD_Pin|ML_FWD_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : EMIT_FL_Pin MR_FWD_Pin ML_BWD_Pin MR_BWD_Pin */
+  GPIO_InitStruct.Pin = EMIT_FL_Pin|MR_FWD_Pin|ML_BWD_Pin|MR_BWD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ML_FWD_Pin */
+  GPIO_InitStruct.Pin = ML_FWD_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(ML_FWD_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
