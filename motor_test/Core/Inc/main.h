@@ -59,14 +59,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MR_FWD_Pin GPIO_PIN_12
+#define EMIT_FL_Pin GPIO_PIN_12
+#define EMIT_FL_GPIO_Port GPIOB
+#define MR_FWD_Pin GPIO_PIN_13
 #define MR_FWD_GPIO_Port GPIOB
-#define ML_BWD_Pin GPIO_PIN_13
+#define ML_BWD_Pin GPIO_PIN_14
 #define ML_BWD_GPIO_Port GPIOB
-#define MR_BWD_Pin GPIO_PIN_14
+#define MR_BWD_Pin GPIO_PIN_15
 #define MR_BWD_GPIO_Port GPIOB
-#define ML_FWD_Pin GPIO_PIN_15
-#define ML_FWD_GPIO_Port GPIOB
+#define ML_FWD_Pin GPIO_PIN_8
+#define ML_FWD_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
