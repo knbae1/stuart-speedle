@@ -59,15 +59,12 @@ struct Maze
     //returns best accessible cell for mouse to move to
     Cell getBestCell(Maze *m);
 
-    //functions to return direction after step rotation
-    Direction cw_step(Maze *m);
-    Direction ccw_step(Maze *m);
+    //functions to step rotation, update API & mouseDir
+    void cw_step(Maze *m);
+    void ccw_step(Maze *m);
 
     // sets a certain cell pos as the target cell
     void setGoalCell(Maze *m);
-
-    void rotate(Maze *m);
-    void move(Maze *m);
     // only updates the simulator
     void updateSimulator(Maze m);
     void _reset_distances(Maze *m);
@@ -130,23 +127,30 @@ Cell getBestCell(Maze *m) {
     int d{m->distances[m->mousePos.y][m->mousePos.x]};
 }
 
-Direction cw_step(Maze *m) {
-    if (m->mouseDir == 3) {
-			m->mouseDir = NORTH;
-			
-	} else m->mouseDir = (Direction)((m->mouseDir + 3) % 4);
+void cw_step(Maze *m) {
     API::turnRight();
-    return m->mouseDir;
-	
-		
+    m->mouseDir = (Direction)((m->mouseDir +1)%4);
 }
 
-Direction ccw_step(Maze *m) {
-    if (m->mouseDir==0) {
-			m->mouseDir = WEST;
-		}	else m->mouseDir = (Direction)((m->mouseDir + 1) % 4);
+void ccw_step(Maze *m) {
+    /*
+    if (m->mouseDir == NORTH) {
+        m->mouseDir == WEST;
+    }
+    else if (m->mouseDir == EAST) {
+        m->mouseDir == NORTH;
+    }
+    else if (m->mouseDir == SOUTH) {
+        m->mouseDir == EAST;
+    }
+    else if (m->mouseDir == WEST) {
+        m->mouseDir == SOUTH;
+    }
+    */
+
     API::turnLeft();
-	return m->mouseDir;
+    m->mouseDir = Direction((m->mouseDir+3)%4);
+    std::cerr << "turned left , new direction is " << m->mouseDir << std::endl;
 }
 
 void setGoalCell(Maze *m) {
@@ -156,34 +160,35 @@ void setGoalCell(Maze *m) {
     m->distances[8][8] = 0;
 }
 
-void rotate(Maze *m) {
-
-}
-
-void move(Maze *m) {
-    API::moveForward();
-   // updatePos();
-}
-
 void updateSimulator(Maze m) {
-    scanWalls(&m);
-    updatePos(&m);
+
+   // updatePos(&m);
     for (int y = 0; y < 16; ++y) {
         for (int x = 0; x < 16; ++x) {
-            API::setText(x, y, std::to_string(m.distances[y][x]));
+           // API::setText(x, y, std::to_string(m.distances[y][x]));
+           // std::cerr << m.cellWalls[y][x] << " y is " << y << " x is " << x << std::endl;
+            
             if (m.cellWalls[y][x] & NORTH_MASK) {
+               // std::cerr << "found wall north " << NORTH_MASK << " "<< y<< ", " << x << std::endl;
                 API::setWall(x, y, 'n');
             }
 
             if (m.cellWalls[y][x] & EAST_MASK) {
+              //  std::cerr << "found wall east" << EAST_MASK << " " << y<< ", " << x << std::endl;
+
                 API::setWall(x, y, 'e');
             }
             if (m.cellWalls[y][x] & SOUTH_MASK) {
+               // std::cerr << "found wall south" << SOUTH_MASK << " " <<y<< ", " << x << std::endl;
+
                 API::setWall(x, y, 's');
             }
             if (m.cellWalls[y][x] & WEST_MASK) {
+              //  std::cerr << "found wall west" << WEST_MASK << " " <<y<< ", " << x << std::endl;
+
                 API::setWall(x, y, 'w');
             }
+            
             
         }
     }
@@ -191,18 +196,39 @@ void updateSimulator(Maze m) {
 }
 
 void scanWalls(Maze *m) {
-    if (API::wallFront()) {
-        m->cellWalls[m->mousePos.y][m->mousePos.x] |= m->mouseDir;
+    //scan front
+    
+    if (m->mouseDir == NORTH) {
+        if (API::wallFront()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= NORTH_MASK;
+        if (API::wallRight()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= EAST_MASK;
+        if (API::wallLeft()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= WEST_MASK;
     }
-    if (API::wallRight()) {
-        m->cellWalls[m->mousePos.y][m->mousePos.x] |= ((m->mouseDir+1)%4);
+    else if (m->mouseDir == EAST) {
+        if (API::wallFront()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= EAST_MASK;
+        if (API::wallRight()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= SOUTH_MASK;
+        if (API::wallLeft()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= NORTH_MASK;
     }
-    if (API::wallLeft()) {
-        m->cellWalls[m->mousePos.y][m->mousePos.x] |= ((m->mouseDir+3)%4);
+    else if (m->mouseDir == SOUTH) {
+        if (API::wallFront()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= SOUTH_MASK;
+        if (API::wallRight()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= WEST_MASK;
+        if (API::wallLeft()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= EAST_MASK;
     }
+    else if (m->mouseDir == WEST) {
+        if (API::wallFront()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= WEST_MASK;
+        if (API::wallRight()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= NORTH_MASK;
+        if (API::wallLeft()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= SOUTH_MASK;
+    }
+   
+/*
+    if (API::wallFront()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= DirectionBitmask(m->mouseDir);
+    if (API::wallRight()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= DirectionBitmask((m->mouseDir+1)%4);
+    if (API::wallLeft()) m->cellWalls[m->mousePos.y][m->mousePos.x] |= DirectionBitmask((m->mouseDir+3)%4);
+
+*/
 }
 
 void updatePos(Maze *m){
+    API::moveForward();
     if (m->mouseDir == NORTH)
             m->mousePos.y++;
         if (m->mouseDir == SOUTH)
@@ -212,7 +238,6 @@ void updatePos(Maze *m){
         if (m->mouseDir == EAST)
             m->mousePos.x++;
     std::cerr << "inside function: (" << m->mousePos.x << ", " << m->mousePos.y << ")" << std::endl;
-
 }
 
 Direction dir(Maze *m){
@@ -320,7 +345,14 @@ void _reset_distances(Maze *m)
 
 
 
-
+void init_cellwalls(Maze *m) 
+{
+    for (int i=0; i<16; ++i) {
+        for (int j=0; j<16; ++j) {
+            m->cellWalls[j][i] = 0;
+        }
+    }
+}
 
 
 
@@ -340,8 +372,27 @@ int main(int argc, char* argv[]) {
     API::setWall(0,0,'w');
     API::setWall(0,0, 's');
 
+    init_cellwalls(&m);
+
+    while(true) {
+   
     floodfill(&m);
+    _reset_distances(&m);
+    scanWalls(&m);
     updateSimulator(m);
+
+    if (!API::wallLeft()) {
+        ccw_step(&m);
+    }
+    while (API::wallFront())
+        cw_step(&m);
+
+    
+    //move(&m);
+    updatePos(&m);
+    
+    }
+    
     //scan walls and calculate distance
     /*
     while (true) {
@@ -357,6 +408,7 @@ int main(int argc, char* argv[]) {
         if (!API::wallLeft()) {
             
             ccw_step(&m);
+            
         }
         while (API::wallFront()) {
             cw_step(&m);
