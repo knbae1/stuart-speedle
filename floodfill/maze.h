@@ -53,31 +53,31 @@ struct Maze
     Coord * goalPos;
 };
     //differentiate bt accessible and blocked cells
-    Cell* getNeighborCells(Coord c);
+    CellList* getNeighborCells(Maze *m, Coord c);
     //returns best accessible cell for mouse to move to
-    Cell getBestCell();
+    Cell getBestCell(Maze *m);
 
     //functions to return direction after step rotation
-    Direction cw_step();
-    Direction ccw_step();
+    Direction cw_step(Maze *m);
+    Direction ccw_step(Maze *m);
 
     // sets a certain cell pos as the target cell
-    void setGoalCell();
+    void setGoalCell(Maze *m);
 
-    void rotate();
-    void move();
+    void rotate(Maze *m);
+    void move(Maze *m);
     // only updates the simulator
-    void updateSimulator();
+    void updateSimulator(Maze *m);
 
     //after having moved a step?, if called api move forward
-    void updatePos();
+    void updatePos(Maze *m);
     
     //same thing as update walls
-    void scanWalls();
-    Direction dir() const;
+    void scanWalls(Maze *m);
+    Direction dir(Maze *m);
 
     //updates distances based on new scanned walls
-    void floodfill();
+    void floodfill(Maze *m);
 
 
 
