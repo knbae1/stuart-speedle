@@ -8,19 +8,16 @@ void log(const std::string& text) {
     std::cerr << text << std::endl;
 }
 
-enum Direction {
-    NORTH = 0,
-    EAST = 1,
-    SOUTH = 2,
-    WEST = 3
-};
+
+
+
 
 //k
 //initial values
 
 int main(int argc, char* argv[]) {
     Maze *m;
-    //log("Running...");
+    log("Running...");
     std::cerr << NORTH << std::endl;
     API::setColor(0, 0, 'G');
     API::setText(0, 0, "abc");
@@ -32,6 +29,8 @@ int main(int argc, char* argv[]) {
         Direction d = dir(m);
         std::cerr << d << "(" << 0 << ", " << 0 << ")" << std::endl;
         //std::cerr << dir_chars[dir] << std::endl;
+        std::cout << "Hello" << std::endl;
+        floodfill(m);
         scanWalls(m);
         if (!API::wallLeft()) {
             
