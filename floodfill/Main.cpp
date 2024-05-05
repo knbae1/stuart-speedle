@@ -19,7 +19,7 @@ enum Direction {
 //initial values
 
 int main(int argc, char* argv[]) {
-    Maze m;
+    Maze *m;
     //log("Running...");
     std::cerr << NORTH << std::endl;
     API::setColor(0, 0, 'G');
@@ -29,20 +29,20 @@ int main(int argc, char* argv[]) {
     API::setWall(0,0, 's');
     //scan walls and calculate distance
     while (true) {
-        Direction d = m.dir();
+        Direction d = dir(m);
         std::cerr << d << "(" << 0 << ", " << 0 << ")" << std::endl;
         //std::cerr << dir_chars[dir] << std::endl;
-        m.scanWalls();
+        scanWalls(m);
         if (!API::wallLeft()) {
             
-            m.ccw_step();
+            ccw_step(m);
         }
         while (API::wallFront()) {
-            m.cw_step();
+            cw_step(m);
             d = Direction((d + 1)%4);  
 
         }
-        m.move();
+        move(m);
        
 
        
