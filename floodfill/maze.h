@@ -53,7 +53,7 @@ struct Maze
     Coord * goalPos;
 };
     //differentiate bt accessible and blocked cells
-    CellList* getNeighborCells(Maze *m, Coord c);
+    CellList getNeighborCells(Maze *m, Coord c);
     //returns best accessible cell for mouse to move to
     Cell getBestCell(Maze *m);
 
