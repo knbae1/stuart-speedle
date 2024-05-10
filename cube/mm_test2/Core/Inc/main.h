@@ -71,10 +71,6 @@ void Error_Handler(void);
 #define ML_ENC_A_GPIO_Port GPIOA
 #define ML_ENC_B_Pin GPIO_PIN_7
 #define ML_ENC_B_GPIO_Port GPIOA
-#define RECIV_L_Pin GPIO_PIN_0
-#define RECIV_L_GPIO_Port GPIOB
-#define RECIV_FL_Pin GPIO_PIN_1
-#define RECIV_FL_GPIO_Port GPIOB
 #define EMIT_R_Pin GPIO_PIN_10
 #define EMIT_R_GPIO_Port GPIOB
 #define EMIT_L_Pin GPIO_PIN_11
