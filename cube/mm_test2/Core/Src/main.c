@@ -81,7 +81,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 }
 
-void move_motor()
+void rotate_right(uint32_t delay)
 {
 	  TIM2->CCR4 = 1300;
 	  TIM2 ->CCR3 = 1300;
@@ -91,18 +91,51 @@ void move_motor()
 
 	  HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 1); //mr fwd high
 	  HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 0);
-	  HAL_Delay(3000);
-	  //bwd
-	  HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
-	  HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 1);	//mlbwd low
-
-	  HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 0); //mr fwd high
-	  HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 1);
-
-	  HAL_Delay(3000);
+	  HAL_Delay(delay);
 
 }
 
+void rotate_left(uint32_t delay)
+{
+	TIM2->CCR4 = 1300;
+	TIM2 ->CCR3 = 1300;
+	//bwd
+	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
+	HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 1);	//mlbwd low
+
+	HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 0); //mr fwd high
+	HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 1);
+
+	HAL_Delay(delay);
+}
+
+void move_bwd(uint32_t delay)
+{
+	TIM2->CCR4 = 1300;
+	TIM2 ->CCR3 = 1300;
+	//bwd
+	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
+	HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 1);	//mlbwd low
+
+	HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 1); //mr fwd high
+	HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 0);
+
+	HAL_Delay(delay);
+}
+
+void move_fwd(uint32_t delay)
+{
+	TIM2->CCR4 = 1300;
+	TIM2 ->CCR3 = 1300;
+	//bwd
+	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 1); // ml fwd high
+	HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 0);	//mlbwd low
+
+	HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 0); //mr fwd high
+	HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 1);
+
+	HAL_Delay(delay);
+}
 /* USER CODE END 0 */
 
 /**
@@ -152,7 +185,17 @@ HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
 
   while (1)
   {
-	  move_motor();
+	  rotate_left(1000);
+
+	  rotate_right(2000);
+
+	  rotate_left(4000);
+
+	  rotate_right(3000);
+
+	  move_fwd(2000);
+
+	  move_bwd(2000);
 
     /* USER CODE END WHILE */
 
