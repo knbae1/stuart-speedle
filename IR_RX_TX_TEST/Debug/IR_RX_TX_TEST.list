@@ -1,0 +1,1059 @@
+
+IR_RX_TX_TEST.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .isr_vector   0000010c  08000000  08000000  00010000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .text         0000045c  0800010c  0800010c  0001010c  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .rodata       00000000  08000568  08000568  00020004  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .ARM.extab    00000000  08000568  08000568  00020004  2**0
+                  CONTENTS
+  4 .ARM          00000000  08000568  08000568  00020004  2**0
+                  CONTENTS
+  5 .preinit_array 00000000  08000568  08000568  00020004  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .init_array   00000004  08000568  08000568  00010568  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  7 .fini_array   00000004  0800056c  0800056c  0001056c  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  8 .data         00000004  20000000  08000570  00020000  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  9 .bss          000000b4  20000004  08000574  00020004  2**2
+                  ALLOC
+ 10 ._user_heap_stack 00000600  200000b8  08000574  000200b8  2**0
+                  ALLOC
+ 11 .ARM.attributes 00000029  00000000  00000000  00020004  2**0
+                  CONTENTS, READONLY
+ 12 .comment      00000043  00000000  00000000  0002002d  2**0
+                  CONTENTS, READONLY
+ 13 .debug_info   00005a00  00000000  00000000  00020070  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 14 .debug_abbrev 00000c92  00000000  00000000  00025a70  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 15 .debug_aranges 00000730  00000000  00000000  00026708  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 16 .debug_rnglists 000005a5  00000000  00000000  00026e38  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 17 .debug_macro  00015f18  00000000  00000000  000273dd  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 18 .debug_line   00006f7e  00000000  00000000  0003d2f5  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 19 .debug_str    000838ef  00000000  00000000  00044273  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 20 .debug_frame  00001e0c  00000000  00000000  000c7b64  2**2
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 21 .debug_line_str 00000067  00000000  00000000  000c9970  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+0800010c <__do_global_dtors_aux>:
+ 800010c:	b510      	push	{r4, lr}
+ 800010e:	4c05      	ldr	r4, [pc, #20]	; (8000124 <__do_global_dtors_aux+0x18>)
+ 8000110:	7823      	ldrb	r3, [r4, #0]
+ 8000112:	b933      	cbnz	r3, 8000122 <__do_global_dtors_aux+0x16>
+ 8000114:	4b04      	ldr	r3, [pc, #16]	; (8000128 <__do_global_dtors_aux+0x1c>)
+ 8000116:	b113      	cbz	r3, 800011e <__do_global_dtors_aux+0x12>
+ 8000118:	4804      	ldr	r0, [pc, #16]	; (800012c <__do_global_dtors_aux+0x20>)
+ 800011a:	f3af 8000 	nop.w
+ 800011e:	2301      	movs	r3, #1
+ 8000120:	7023      	strb	r3, [r4, #0]
+ 8000122:	bd10      	pop	{r4, pc}
+ 8000124:	20000004 	.word	0x20000004
+ 8000128:	00000000 	.word	0x00000000
+ 800012c:	08000550 	.word	0x08000550
+
+08000130 <frame_dummy>:
+ 8000130:	b508      	push	{r3, lr}
+ 8000132:	4b03      	ldr	r3, [pc, #12]	; (8000140 <frame_dummy+0x10>)
+ 8000134:	b11b      	cbz	r3, 800013e <frame_dummy+0xe>
+ 8000136:	4903      	ldr	r1, [pc, #12]	; (8000144 <frame_dummy+0x14>)
+ 8000138:	4803      	ldr	r0, [pc, #12]	; (8000148 <frame_dummy+0x18>)
+ 800013a:	f3af 8000 	nop.w
+ 800013e:	bd08      	pop	{r3, pc}
+ 8000140:	00000000 	.word	0x00000000
+ 8000144:	20000008 	.word	0x20000008
+ 8000148:	08000550 	.word	0x08000550
+
+0800014c <HAL_TIM_IC_CaptureCallback>:
+int16_t old_right_position;
+int16_t old_left_position;
+
+
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+ 800014c:	b480      	push	{r7}
+ 800014e:	b083      	sub	sp, #12
+ 8000150:	af00      	add	r7, sp, #0
+ 8000152:	6078      	str	r0, [r7, #4]
+	if (htim->Instance == TIM3) {
+ 8000154:	687b      	ldr	r3, [r7, #4]
+ 8000156:	681b      	ldr	r3, [r3, #0]
+ 8000158:	4a0c      	ldr	r2, [pc, #48]	; (800018c <HAL_TIM_IC_CaptureCallback+0x40>)
+ 800015a:	4293      	cmp	r3, r2
+ 800015c:	d105      	bne.n	800016a <HAL_TIM_IC_CaptureCallback+0x1e>
+		left_encoder_count= __HAL_TIM_GET_COUNTER(htim);
+ 800015e:	687b      	ldr	r3, [r7, #4]
+ 8000160:	681b      	ldr	r3, [r3, #0]
+ 8000162:	6a5b      	ldr	r3, [r3, #36]	; 0x24
+ 8000164:	b29a      	uxth	r2, r3
+ 8000166:	4b0a      	ldr	r3, [pc, #40]	; (8000190 <HAL_TIM_IC_CaptureCallback+0x44>)
+ 8000168:	801a      	strh	r2, [r3, #0]
+		//left_encoder_count = (uint16_t) left_encoder_counter;
+		//left_position = left_encoder_count / 30;
+	}
+	if (htim->Instance == TIM4) {
+ 800016a:	687b      	ldr	r3, [r7, #4]
+ 800016c:	681b      	ldr	r3, [r3, #0]
+ 800016e:	4a09      	ldr	r2, [pc, #36]	; (8000194 <HAL_TIM_IC_CaptureCallback+0x48>)
+ 8000170:	4293      	cmp	r3, r2
+ 8000172:	d105      	bne.n	8000180 <HAL_TIM_IC_CaptureCallback+0x34>
+		right_encoder_count= __HAL_TIM_GET_COUNTER(htim);
+ 8000174:	687b      	ldr	r3, [r7, #4]
+ 8000176:	681b      	ldr	r3, [r3, #0]
+ 8000178:	6a5b      	ldr	r3, [r3, #36]	; 0x24
+ 800017a:	b29a      	uxth	r2, r3
+ 800017c:	4b06      	ldr	r3, [pc, #24]	; (8000198 <HAL_TIM_IC_CaptureCallback+0x4c>)
+ 800017e:	801a      	strh	r2, [r3, #0]
+		//right_encoder_count = (uint16_t) right_encoder_counter;
+		//right_position = right_encoder_count / 30;
+	}
+
+
+}
+ 8000180:	bf00      	nop
+ 8000182:	370c      	adds	r7, #12
+ 8000184:	46bd      	mov	sp, r7
+ 8000186:	bc80      	pop	{r7}
+ 8000188:	4770      	bx	lr
+ 800018a:	bf00      	nop
+ 800018c:	40000400 	.word	0x40000400
+ 8000190:	200000b2 	.word	0x200000b2
+ 8000194:	40000800 	.word	0x40000800
+ 8000198:	200000b0 	.word	0x200000b0
+
+0800019c <NMI_Handler>:
+/******************************************************************************/
+/**
+  * @brief This function handles Non maskable interrupt.
+  */
+void NMI_Handler(void)
+{
+ 800019c:	b480      	push	{r7}
+ 800019e:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+
+  /* USER CODE END NonMaskableInt_IRQn 0 */
+  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+   while (1)
+ 80001a0:	e7fe      	b.n	80001a0 <NMI_Handler+0x4>
+
+080001a2 <HardFault_Handler>:
+
+/**
+  * @brief This function handles Hard fault interrupt.
+  */
+void HardFault_Handler(void)
+{
+ 80001a2:	b480      	push	{r7}
+ 80001a4:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN HardFault_IRQn 0 */
+
+  /* USER CODE END HardFault_IRQn 0 */
+  while (1)
+ 80001a6:	e7fe      	b.n	80001a6 <HardFault_Handler+0x4>
+
+080001a8 <MemManage_Handler>:
+
+/**
+  * @brief This function handles Memory management fault.
+  */
+void MemManage_Handler(void)
+{
+ 80001a8:	b480      	push	{r7}
+ 80001aa:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+
+  /* USER CODE END MemoryManagement_IRQn 0 */
+  while (1)
+ 80001ac:	e7fe      	b.n	80001ac <MemManage_Handler+0x4>
+
+080001ae <BusFault_Handler>:
+
+/**
+  * @brief This function handles Prefetch fault, memory access fault.
+  */
+void BusFault_Handler(void)
+{
+ 80001ae:	b480      	push	{r7}
+ 80001b0:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN BusFault_IRQn 0 */
+
+  /* USER CODE END BusFault_IRQn 0 */
+  while (1)
+ 80001b2:	e7fe      	b.n	80001b2 <BusFault_Handler+0x4>
+
+080001b4 <UsageFault_Handler>:
+
+/**
+  * @brief This function handles Undefined instruction or illegal state.
+  */
+void UsageFault_Handler(void)
+{
+ 80001b4:	b480      	push	{r7}
+ 80001b6:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN UsageFault_IRQn 0 */
+
+  /* USER CODE END UsageFault_IRQn 0 */
+  while (1)
+ 80001b8:	e7fe      	b.n	80001b8 <UsageFault_Handler+0x4>
+
+080001ba <SVC_Handler>:
+
+/**
+  * @brief This function handles System service call via SWI instruction.
+  */
+void SVC_Handler(void)
+{
+ 80001ba:	b480      	push	{r7}
+ 80001bc:	af00      	add	r7, sp, #0
+
+  /* USER CODE END SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 1 */
+
+  /* USER CODE END SVCall_IRQn 1 */
+}
+ 80001be:	bf00      	nop
+ 80001c0:	46bd      	mov	sp, r7
+ 80001c2:	bc80      	pop	{r7}
+ 80001c4:	4770      	bx	lr
+
+080001c6 <DebugMon_Handler>:
+
+/**
+  * @brief This function handles Debug monitor.
+  */
+void DebugMon_Handler(void)
+{
+ 80001c6:	b480      	push	{r7}
+ 80001c8:	af00      	add	r7, sp, #0
+
+  /* USER CODE END DebugMonitor_IRQn 0 */
+  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+
+  /* USER CODE END DebugMonitor_IRQn 1 */
+}
+ 80001ca:	bf00      	nop
+ 80001cc:	46bd      	mov	sp, r7
+ 80001ce:	bc80      	pop	{r7}
+ 80001d0:	4770      	bx	lr
+
+080001d2 <PendSV_Handler>:
+
+/**
+  * @brief This function handles Pendable request for system service.
+  */
+void PendSV_Handler(void)
+{
+ 80001d2:	b480      	push	{r7}
+ 80001d4:	af00      	add	r7, sp, #0
+
+  /* USER CODE END PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 1 */
+
+  /* USER CODE END PendSV_IRQn 1 */
+}
+ 80001d6:	bf00      	nop
+ 80001d8:	46bd      	mov	sp, r7
+ 80001da:	bc80      	pop	{r7}
+ 80001dc:	4770      	bx	lr
+
+080001de <SysTick_Handler>:
+
+/**
+  * @brief This function handles System tick timer.
+  */
+void SysTick_Handler(void)
+{
+ 80001de:	b580      	push	{r7, lr}
+ 80001e0:	af00      	add	r7, sp, #0
+
+
+
+
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+ 80001e2:	f000 f841 	bl	8000268 <HAL_IncTick>
+  /* USER CODE BEGIN SysTick_IRQn 1 */
+
+
+  /* USER CODE END SysTick_IRQn 1 */
+}
+ 80001e6:	bf00      	nop
+ 80001e8:	bd80      	pop	{r7, pc}
+	...
+
+080001ec <TIM3_IRQHandler>:
+
+/**
+  * @brief This function handles TIM3 global interrupt.
+  */
+void TIM3_IRQHandler(void)
+{
+ 80001ec:	b580      	push	{r7, lr}
+ 80001ee:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+
+  /* USER CODE END TIM3_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim3);
+ 80001f0:	4802      	ldr	r0, [pc, #8]	; (80001fc <TIM3_IRQHandler+0x10>)
+ 80001f2:	f000 f84b 	bl	800028c <HAL_TIM_IRQHandler>
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+
+  /* USER CODE END TIM3_IRQn 1 */
+}
+ 80001f6:	bf00      	nop
+ 80001f8:	bd80      	pop	{r7, pc}
+ 80001fa:	bf00      	nop
+ 80001fc:	20000020 	.word	0x20000020
+
+08000200 <TIM4_IRQHandler>:
+
+/**
+  * @brief This function handles TIM4 global interrupt.
+  */
+void TIM4_IRQHandler(void)
+{
+ 8000200:	b580      	push	{r7, lr}
+ 8000202:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN TIM4_IRQn 0 */
+
+  /* USER CODE END TIM4_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim4);
+ 8000204:	4802      	ldr	r0, [pc, #8]	; (8000210 <TIM4_IRQHandler+0x10>)
+ 8000206:	f000 f841 	bl	800028c <HAL_TIM_IRQHandler>
+  /* USER CODE BEGIN TIM4_IRQn 1 */
+
+  /* USER CODE END TIM4_IRQn 1 */
+}
+ 800020a:	bf00      	nop
+ 800020c:	bd80      	pop	{r7, pc}
+ 800020e:	bf00      	nop
+ 8000210:	20000068 	.word	0x20000068
+
+08000214 <SystemInit>:
+  * @note   This function should be used only after reset.
+  * @param  None
+  * @retval None
+  */
+void SystemInit (void)
+{
+ 8000214:	b480      	push	{r7}
+ 8000216:	af00      	add	r7, sp, #0
+
+  /* Configure the Vector Table location -------------------------------------*/
+#if defined(USER_VECT_TAB_ADDRESS)
+  SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM. */
+#endif /* USER_VECT_TAB_ADDRESS */
+}
+ 8000218:	bf00      	nop
+ 800021a:	46bd      	mov	sp, r7
+ 800021c:	bc80      	pop	{r7}
+ 800021e:	4770      	bx	lr
+
+08000220 <Reset_Handler>:
+  .weak Reset_Handler
+  .type Reset_Handler, %function
+Reset_Handler:
+
+/* Call the clock system initialization function.*/
+    bl  SystemInit
+ 8000220:	f7ff fff8 	bl	8000214 <SystemInit>
+
+/* Copy the data segment initializers from flash to SRAM */
+  ldr r0, =_sdata
+ 8000224:	480a      	ldr	r0, [pc, #40]	; (8000250 <LoopFillZerobss+0xa>)
+  ldr r1, =_edata
+ 8000226:	490b      	ldr	r1, [pc, #44]	; (8000254 <LoopFillZerobss+0xe>)
+  ldr r2, =_sidata
+ 8000228:	4a0b      	ldr	r2, [pc, #44]	; (8000258 <LoopFillZerobss+0x12>)
+  movs r3, #0
+ 800022a:	2300      	movs	r3, #0
+  b LoopCopyDataInit
+ 800022c:	e002      	b.n	8000234 <LoopCopyDataInit>
+
+0800022e <CopyDataInit>:
+
+CopyDataInit:
+  ldr r4, [r2, r3]
+ 800022e:	58d4      	ldr	r4, [r2, r3]
+  str r4, [r0, r3]
+ 8000230:	50c4      	str	r4, [r0, r3]
+  adds r3, r3, #4
+ 8000232:	3304      	adds	r3, #4
+
+08000234 <LoopCopyDataInit>:
+
+LoopCopyDataInit:
+  adds r4, r0, r3
+ 8000234:	18c4      	adds	r4, r0, r3
+  cmp r4, r1
+ 8000236:	428c      	cmp	r4, r1
+  bcc CopyDataInit
+ 8000238:	d3f9      	bcc.n	800022e <CopyDataInit>
+  
+/* Zero fill the bss segment. */
+  ldr r2, =_sbss
+ 800023a:	4a08      	ldr	r2, [pc, #32]	; (800025c <LoopFillZerobss+0x16>)
+  ldr r4, =_ebss
+ 800023c:	4c08      	ldr	r4, [pc, #32]	; (8000260 <LoopFillZerobss+0x1a>)
+  movs r3, #0
+ 800023e:	2300      	movs	r3, #0
+  b LoopFillZerobss
+ 8000240:	e001      	b.n	8000246 <LoopFillZerobss>
+
+08000242 <FillZerobss>:
+
+FillZerobss:
+  str  r3, [r2]
+ 8000242:	6013      	str	r3, [r2, #0]
+  adds r2, r2, #4
+ 8000244:	3204      	adds	r2, #4
+
+08000246 <LoopFillZerobss>:
+
+LoopFillZerobss:
+  cmp r2, r4
+ 8000246:	42a2      	cmp	r2, r4
+  bcc FillZerobss
+ 8000248:	d3fb      	bcc.n	8000242 <FillZerobss>
+
+/* Call static constructors */
+    bl __libc_init_array
+ 800024a:	f000 f95d 	bl	8000508 <__libc_init_array>
+/* Call the application's entry point.*/
+  //bl main
+  bx lr
+ 800024e:	4770      	bx	lr
+  ldr r0, =_sdata
+ 8000250:	20000000 	.word	0x20000000
+  ldr r1, =_edata
+ 8000254:	20000004 	.word	0x20000004
+  ldr r2, =_sidata
+ 8000258:	08000570 	.word	0x08000570
+  ldr r2, =_sbss
+ 800025c:	20000004 	.word	0x20000004
+  ldr r4, =_ebss
+ 8000260:	200000b8 	.word	0x200000b8
+
+08000264 <ADC1_2_IRQHandler>:
+ * @retval : None
+*/
+    .section .text.Default_Handler,"ax",%progbits
+Default_Handler:
+Infinite_Loop:
+  b Infinite_Loop
+ 8000264:	e7fe      	b.n	8000264 <ADC1_2_IRQHandler>
+	...
+
+08000268 <HAL_IncTick>:
+  * @note This function is declared as __weak to be overwritten in case of other
+  *      implementations in user file.
+  * @retval None
+  */
+__weak void HAL_IncTick(void)
+{
+ 8000268:	b480      	push	{r7}
+ 800026a:	af00      	add	r7, sp, #0
+  uwTick += uwTickFreq;
+ 800026c:	4b05      	ldr	r3, [pc, #20]	; (8000284 <HAL_IncTick+0x1c>)
+ 800026e:	781b      	ldrb	r3, [r3, #0]
+ 8000270:	461a      	mov	r2, r3
+ 8000272:	4b05      	ldr	r3, [pc, #20]	; (8000288 <HAL_IncTick+0x20>)
+ 8000274:	681b      	ldr	r3, [r3, #0]
+ 8000276:	4413      	add	r3, r2
+ 8000278:	4a03      	ldr	r2, [pc, #12]	; (8000288 <HAL_IncTick+0x20>)
+ 800027a:	6013      	str	r3, [r2, #0]
+}
+ 800027c:	bf00      	nop
+ 800027e:	46bd      	mov	sp, r7
+ 8000280:	bc80      	pop	{r7}
+ 8000282:	4770      	bx	lr
+ 8000284:	20000000 	.word	0x20000000
+ 8000288:	200000b4 	.word	0x200000b4
+
+0800028c <HAL_TIM_IRQHandler>:
+  * @brief  This function handles TIM interrupts requests.
+  * @param  htim TIM  handle
+  * @retval None
+  */
+void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
+{
+ 800028c:	b580      	push	{r7, lr}
+ 800028e:	b082      	sub	sp, #8
+ 8000290:	af00      	add	r7, sp, #0
+ 8000292:	6078      	str	r0, [r7, #4]
+  /* Capture compare 1 event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC1) != RESET)
+ 8000294:	687b      	ldr	r3, [r7, #4]
+ 8000296:	681b      	ldr	r3, [r3, #0]
+ 8000298:	691b      	ldr	r3, [r3, #16]
+ 800029a:	f003 0302 	and.w	r3, r3, #2
+ 800029e:	2b02      	cmp	r3, #2
+ 80002a0:	d122      	bne.n	80002e8 <HAL_TIM_IRQHandler+0x5c>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC1) != RESET)
+ 80002a2:	687b      	ldr	r3, [r7, #4]
+ 80002a4:	681b      	ldr	r3, [r3, #0]
+ 80002a6:	68db      	ldr	r3, [r3, #12]
+ 80002a8:	f003 0302 	and.w	r3, r3, #2
+ 80002ac:	2b02      	cmp	r3, #2
+ 80002ae:	d11b      	bne.n	80002e8 <HAL_TIM_IRQHandler+0x5c>
+    {
+      {
+        __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
+ 80002b0:	687b      	ldr	r3, [r7, #4]
+ 80002b2:	681b      	ldr	r3, [r3, #0]
+ 80002b4:	f06f 0202 	mvn.w	r2, #2
+ 80002b8:	611a      	str	r2, [r3, #16]
+        htim->Channel = HAL_TIM_ACTIVE_CHANNEL_1;
+ 80002ba:	687b      	ldr	r3, [r7, #4]
+ 80002bc:	2201      	movs	r2, #1
+ 80002be:	771a      	strb	r2, [r3, #28]
+
+        /* Input capture event */
+        if ((htim->Instance->CCMR1 & TIM_CCMR1_CC1S) != 0x00U)
+ 80002c0:	687b      	ldr	r3, [r7, #4]
+ 80002c2:	681b      	ldr	r3, [r3, #0]
+ 80002c4:	699b      	ldr	r3, [r3, #24]
+ 80002c6:	f003 0303 	and.w	r3, r3, #3
+ 80002ca:	2b00      	cmp	r3, #0
+ 80002cc:	d003      	beq.n	80002d6 <HAL_TIM_IRQHandler+0x4a>
+        {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+          htim->IC_CaptureCallback(htim);
+#else
+          HAL_TIM_IC_CaptureCallback(htim);
+ 80002ce:	6878      	ldr	r0, [r7, #4]
+ 80002d0:	f7ff ff3c 	bl	800014c <HAL_TIM_IC_CaptureCallback>
+ 80002d4:	e005      	b.n	80002e2 <HAL_TIM_IRQHandler+0x56>
+        {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+          htim->OC_DelayElapsedCallback(htim);
+          htim->PWM_PulseFinishedCallback(htim);
+#else
+          HAL_TIM_OC_DelayElapsedCallback(htim);
+ 80002d6:	6878      	ldr	r0, [r7, #4]
+ 80002d8:	f000 f8e9 	bl	80004ae <HAL_TIM_OC_DelayElapsedCallback>
+          HAL_TIM_PWM_PulseFinishedCallback(htim);
+ 80002dc:	6878      	ldr	r0, [r7, #4]
+ 80002de:	f000 f8ef 	bl	80004c0 <HAL_TIM_PWM_PulseFinishedCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+        }
+        htim->Channel = HAL_TIM_ACTIVE_CHANNEL_CLEARED;
+ 80002e2:	687b      	ldr	r3, [r7, #4]
+ 80002e4:	2200      	movs	r2, #0
+ 80002e6:	771a      	strb	r2, [r3, #28]
+      }
+    }
+  }
+  /* Capture compare 2 event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC2) != RESET)
+ 80002e8:	687b      	ldr	r3, [r7, #4]
+ 80002ea:	681b      	ldr	r3, [r3, #0]
+ 80002ec:	691b      	ldr	r3, [r3, #16]
+ 80002ee:	f003 0304 	and.w	r3, r3, #4
+ 80002f2:	2b04      	cmp	r3, #4
+ 80002f4:	d122      	bne.n	800033c <HAL_TIM_IRQHandler+0xb0>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC2) != RESET)
+ 80002f6:	687b      	ldr	r3, [r7, #4]
+ 80002f8:	681b      	ldr	r3, [r3, #0]
+ 80002fa:	68db      	ldr	r3, [r3, #12]
+ 80002fc:	f003 0304 	and.w	r3, r3, #4
+ 8000300:	2b04      	cmp	r3, #4
+ 8000302:	d11b      	bne.n	800033c <HAL_TIM_IRQHandler+0xb0>
+    {
+      __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC2);
+ 8000304:	687b      	ldr	r3, [r7, #4]
+ 8000306:	681b      	ldr	r3, [r3, #0]
+ 8000308:	f06f 0204 	mvn.w	r2, #4
+ 800030c:	611a      	str	r2, [r3, #16]
+      htim->Channel = HAL_TIM_ACTIVE_CHANNEL_2;
+ 800030e:	687b      	ldr	r3, [r7, #4]
+ 8000310:	2202      	movs	r2, #2
+ 8000312:	771a      	strb	r2, [r3, #28]
+      /* Input capture event */
+      if ((htim->Instance->CCMR1 & TIM_CCMR1_CC2S) != 0x00U)
+ 8000314:	687b      	ldr	r3, [r7, #4]
+ 8000316:	681b      	ldr	r3, [r3, #0]
+ 8000318:	699b      	ldr	r3, [r3, #24]
+ 800031a:	f403 7340 	and.w	r3, r3, #768	; 0x300
+ 800031e:	2b00      	cmp	r3, #0
+ 8000320:	d003      	beq.n	800032a <HAL_TIM_IRQHandler+0x9e>
+      {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+        htim->IC_CaptureCallback(htim);
+#else
+        HAL_TIM_IC_CaptureCallback(htim);
+ 8000322:	6878      	ldr	r0, [r7, #4]
+ 8000324:	f7ff ff12 	bl	800014c <HAL_TIM_IC_CaptureCallback>
+ 8000328:	e005      	b.n	8000336 <HAL_TIM_IRQHandler+0xaa>
+      {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+        htim->OC_DelayElapsedCallback(htim);
+        htim->PWM_PulseFinishedCallback(htim);
+#else
+        HAL_TIM_OC_DelayElapsedCallback(htim);
+ 800032a:	6878      	ldr	r0, [r7, #4]
+ 800032c:	f000 f8bf 	bl	80004ae <HAL_TIM_OC_DelayElapsedCallback>
+        HAL_TIM_PWM_PulseFinishedCallback(htim);
+ 8000330:	6878      	ldr	r0, [r7, #4]
+ 8000332:	f000 f8c5 	bl	80004c0 <HAL_TIM_PWM_PulseFinishedCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+      }
+      htim->Channel = HAL_TIM_ACTIVE_CHANNEL_CLEARED;
+ 8000336:	687b      	ldr	r3, [r7, #4]
+ 8000338:	2200      	movs	r2, #0
+ 800033a:	771a      	strb	r2, [r3, #28]
+    }
+  }
+  /* Capture compare 3 event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC3) != RESET)
+ 800033c:	687b      	ldr	r3, [r7, #4]
+ 800033e:	681b      	ldr	r3, [r3, #0]
+ 8000340:	691b      	ldr	r3, [r3, #16]
+ 8000342:	f003 0308 	and.w	r3, r3, #8
+ 8000346:	2b08      	cmp	r3, #8
+ 8000348:	d122      	bne.n	8000390 <HAL_TIM_IRQHandler+0x104>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC3) != RESET)
+ 800034a:	687b      	ldr	r3, [r7, #4]
+ 800034c:	681b      	ldr	r3, [r3, #0]
+ 800034e:	68db      	ldr	r3, [r3, #12]
+ 8000350:	f003 0308 	and.w	r3, r3, #8
+ 8000354:	2b08      	cmp	r3, #8
+ 8000356:	d11b      	bne.n	8000390 <HAL_TIM_IRQHandler+0x104>
+    {
+      __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC3);
+ 8000358:	687b      	ldr	r3, [r7, #4]
+ 800035a:	681b      	ldr	r3, [r3, #0]
+ 800035c:	f06f 0208 	mvn.w	r2, #8
+ 8000360:	611a      	str	r2, [r3, #16]
+      htim->Channel = HAL_TIM_ACTIVE_CHANNEL_3;
+ 8000362:	687b      	ldr	r3, [r7, #4]
+ 8000364:	2204      	movs	r2, #4
+ 8000366:	771a      	strb	r2, [r3, #28]
+      /* Input capture event */
+      if ((htim->Instance->CCMR2 & TIM_CCMR2_CC3S) != 0x00U)
+ 8000368:	687b      	ldr	r3, [r7, #4]
+ 800036a:	681b      	ldr	r3, [r3, #0]
+ 800036c:	69db      	ldr	r3, [r3, #28]
+ 800036e:	f003 0303 	and.w	r3, r3, #3
+ 8000372:	2b00      	cmp	r3, #0
+ 8000374:	d003      	beq.n	800037e <HAL_TIM_IRQHandler+0xf2>
+      {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+        htim->IC_CaptureCallback(htim);
+#else
+        HAL_TIM_IC_CaptureCallback(htim);
+ 8000376:	6878      	ldr	r0, [r7, #4]
+ 8000378:	f7ff fee8 	bl	800014c <HAL_TIM_IC_CaptureCallback>
+ 800037c:	e005      	b.n	800038a <HAL_TIM_IRQHandler+0xfe>
+      {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+        htim->OC_DelayElapsedCallback(htim);
+        htim->PWM_PulseFinishedCallback(htim);
+#else
+        HAL_TIM_OC_DelayElapsedCallback(htim);
+ 800037e:	6878      	ldr	r0, [r7, #4]
+ 8000380:	f000 f895 	bl	80004ae <HAL_TIM_OC_DelayElapsedCallback>
+        HAL_TIM_PWM_PulseFinishedCallback(htim);
+ 8000384:	6878      	ldr	r0, [r7, #4]
+ 8000386:	f000 f89b 	bl	80004c0 <HAL_TIM_PWM_PulseFinishedCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+      }
+      htim->Channel = HAL_TIM_ACTIVE_CHANNEL_CLEARED;
+ 800038a:	687b      	ldr	r3, [r7, #4]
+ 800038c:	2200      	movs	r2, #0
+ 800038e:	771a      	strb	r2, [r3, #28]
+    }
+  }
+  /* Capture compare 4 event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC4) != RESET)
+ 8000390:	687b      	ldr	r3, [r7, #4]
+ 8000392:	681b      	ldr	r3, [r3, #0]
+ 8000394:	691b      	ldr	r3, [r3, #16]
+ 8000396:	f003 0310 	and.w	r3, r3, #16
+ 800039a:	2b10      	cmp	r3, #16
+ 800039c:	d122      	bne.n	80003e4 <HAL_TIM_IRQHandler+0x158>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC4) != RESET)
+ 800039e:	687b      	ldr	r3, [r7, #4]
+ 80003a0:	681b      	ldr	r3, [r3, #0]
+ 80003a2:	68db      	ldr	r3, [r3, #12]
+ 80003a4:	f003 0310 	and.w	r3, r3, #16
+ 80003a8:	2b10      	cmp	r3, #16
+ 80003aa:	d11b      	bne.n	80003e4 <HAL_TIM_IRQHandler+0x158>
+    {
+      __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC4);
+ 80003ac:	687b      	ldr	r3, [r7, #4]
+ 80003ae:	681b      	ldr	r3, [r3, #0]
+ 80003b0:	f06f 0210 	mvn.w	r2, #16
+ 80003b4:	611a      	str	r2, [r3, #16]
+      htim->Channel = HAL_TIM_ACTIVE_CHANNEL_4;
+ 80003b6:	687b      	ldr	r3, [r7, #4]
+ 80003b8:	2208      	movs	r2, #8
+ 80003ba:	771a      	strb	r2, [r3, #28]
+      /* Input capture event */
+      if ((htim->Instance->CCMR2 & TIM_CCMR2_CC4S) != 0x00U)
+ 80003bc:	687b      	ldr	r3, [r7, #4]
+ 80003be:	681b      	ldr	r3, [r3, #0]
+ 80003c0:	69db      	ldr	r3, [r3, #28]
+ 80003c2:	f403 7340 	and.w	r3, r3, #768	; 0x300
+ 80003c6:	2b00      	cmp	r3, #0
+ 80003c8:	d003      	beq.n	80003d2 <HAL_TIM_IRQHandler+0x146>
+      {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+        htim->IC_CaptureCallback(htim);
+#else
+        HAL_TIM_IC_CaptureCallback(htim);
+ 80003ca:	6878      	ldr	r0, [r7, #4]
+ 80003cc:	f7ff febe 	bl	800014c <HAL_TIM_IC_CaptureCallback>
+ 80003d0:	e005      	b.n	80003de <HAL_TIM_IRQHandler+0x152>
+      {
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+        htim->OC_DelayElapsedCallback(htim);
+        htim->PWM_PulseFinishedCallback(htim);
+#else
+        HAL_TIM_OC_DelayElapsedCallback(htim);
+ 80003d2:	6878      	ldr	r0, [r7, #4]
+ 80003d4:	f000 f86b 	bl	80004ae <HAL_TIM_OC_DelayElapsedCallback>
+        HAL_TIM_PWM_PulseFinishedCallback(htim);
+ 80003d8:	6878      	ldr	r0, [r7, #4]
+ 80003da:	f000 f871 	bl	80004c0 <HAL_TIM_PWM_PulseFinishedCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+      }
+      htim->Channel = HAL_TIM_ACTIVE_CHANNEL_CLEARED;
+ 80003de:	687b      	ldr	r3, [r7, #4]
+ 80003e0:	2200      	movs	r2, #0
+ 80003e2:	771a      	strb	r2, [r3, #28]
+    }
+  }
+  /* TIM Update event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_UPDATE) != RESET)
+ 80003e4:	687b      	ldr	r3, [r7, #4]
+ 80003e6:	681b      	ldr	r3, [r3, #0]
+ 80003e8:	691b      	ldr	r3, [r3, #16]
+ 80003ea:	f003 0301 	and.w	r3, r3, #1
+ 80003ee:	2b01      	cmp	r3, #1
+ 80003f0:	d10e      	bne.n	8000410 <HAL_TIM_IRQHandler+0x184>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_UPDATE) != RESET)
+ 80003f2:	687b      	ldr	r3, [r7, #4]
+ 80003f4:	681b      	ldr	r3, [r3, #0]
+ 80003f6:	68db      	ldr	r3, [r3, #12]
+ 80003f8:	f003 0301 	and.w	r3, r3, #1
+ 80003fc:	2b01      	cmp	r3, #1
+ 80003fe:	d107      	bne.n	8000410 <HAL_TIM_IRQHandler+0x184>
+    {
+      __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);
+ 8000400:	687b      	ldr	r3, [r7, #4]
+ 8000402:	681b      	ldr	r3, [r3, #0]
+ 8000404:	f06f 0201 	mvn.w	r2, #1
+ 8000408:	611a      	str	r2, [r3, #16]
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+      htim->PeriodElapsedCallback(htim);
+#else
+      HAL_TIM_PeriodElapsedCallback(htim);
+ 800040a:	6878      	ldr	r0, [r7, #4]
+ 800040c:	f000 f846 	bl	800049c <HAL_TIM_PeriodElapsedCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+    }
+  }
+  /* TIM Break input event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_BREAK) != RESET)
+ 8000410:	687b      	ldr	r3, [r7, #4]
+ 8000412:	681b      	ldr	r3, [r3, #0]
+ 8000414:	691b      	ldr	r3, [r3, #16]
+ 8000416:	f003 0380 	and.w	r3, r3, #128	; 0x80
+ 800041a:	2b80      	cmp	r3, #128	; 0x80
+ 800041c:	d10e      	bne.n	800043c <HAL_TIM_IRQHandler+0x1b0>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_BREAK) != RESET)
+ 800041e:	687b      	ldr	r3, [r7, #4]
+ 8000420:	681b      	ldr	r3, [r3, #0]
+ 8000422:	68db      	ldr	r3, [r3, #12]
+ 8000424:	f003 0380 	and.w	r3, r3, #128	; 0x80
+ 8000428:	2b80      	cmp	r3, #128	; 0x80
+ 800042a:	d107      	bne.n	800043c <HAL_TIM_IRQHandler+0x1b0>
+    {
+      __HAL_TIM_CLEAR_IT(htim, TIM_IT_BREAK);
+ 800042c:	687b      	ldr	r3, [r7, #4]
+ 800042e:	681b      	ldr	r3, [r3, #0]
+ 8000430:	f06f 0280 	mvn.w	r2, #128	; 0x80
+ 8000434:	611a      	str	r2, [r3, #16]
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+      htim->BreakCallback(htim);
+#else
+      HAL_TIMEx_BreakCallback(htim);
+ 8000436:	6878      	ldr	r0, [r7, #4]
+ 8000438:	f000 f85d 	bl	80004f6 <HAL_TIMEx_BreakCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+    }
+  }
+  /* TIM Trigger detection event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_TRIGGER) != RESET)
+ 800043c:	687b      	ldr	r3, [r7, #4]
+ 800043e:	681b      	ldr	r3, [r3, #0]
+ 8000440:	691b      	ldr	r3, [r3, #16]
+ 8000442:	f003 0340 	and.w	r3, r3, #64	; 0x40
+ 8000446:	2b40      	cmp	r3, #64	; 0x40
+ 8000448:	d10e      	bne.n	8000468 <HAL_TIM_IRQHandler+0x1dc>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_TRIGGER) != RESET)
+ 800044a:	687b      	ldr	r3, [r7, #4]
+ 800044c:	681b      	ldr	r3, [r3, #0]
+ 800044e:	68db      	ldr	r3, [r3, #12]
+ 8000450:	f003 0340 	and.w	r3, r3, #64	; 0x40
+ 8000454:	2b40      	cmp	r3, #64	; 0x40
+ 8000456:	d107      	bne.n	8000468 <HAL_TIM_IRQHandler+0x1dc>
+    {
+      __HAL_TIM_CLEAR_IT(htim, TIM_IT_TRIGGER);
+ 8000458:	687b      	ldr	r3, [r7, #4]
+ 800045a:	681b      	ldr	r3, [r3, #0]
+ 800045c:	f06f 0240 	mvn.w	r2, #64	; 0x40
+ 8000460:	611a      	str	r2, [r3, #16]
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+      htim->TriggerCallback(htim);
+#else
+      HAL_TIM_TriggerCallback(htim);
+ 8000462:	6878      	ldr	r0, [r7, #4]
+ 8000464:	f000 f835 	bl	80004d2 <HAL_TIM_TriggerCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+    }
+  }
+  /* TIM commutation event */
+  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_COM) != RESET)
+ 8000468:	687b      	ldr	r3, [r7, #4]
+ 800046a:	681b      	ldr	r3, [r3, #0]
+ 800046c:	691b      	ldr	r3, [r3, #16]
+ 800046e:	f003 0320 	and.w	r3, r3, #32
+ 8000472:	2b20      	cmp	r3, #32
+ 8000474:	d10e      	bne.n	8000494 <HAL_TIM_IRQHandler+0x208>
+  {
+    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_COM) != RESET)
+ 8000476:	687b      	ldr	r3, [r7, #4]
+ 8000478:	681b      	ldr	r3, [r3, #0]
+ 800047a:	68db      	ldr	r3, [r3, #12]
+ 800047c:	f003 0320 	and.w	r3, r3, #32
+ 8000480:	2b20      	cmp	r3, #32
+ 8000482:	d107      	bne.n	8000494 <HAL_TIM_IRQHandler+0x208>
+    {
+      __HAL_TIM_CLEAR_IT(htim, TIM_FLAG_COM);
+ 8000484:	687b      	ldr	r3, [r7, #4]
+ 8000486:	681b      	ldr	r3, [r3, #0]
+ 8000488:	f06f 0220 	mvn.w	r2, #32
+ 800048c:	611a      	str	r2, [r3, #16]
+#if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
+      htim->CommutationCallback(htim);
+#else
+      HAL_TIMEx_CommutCallback(htim);
+ 800048e:	6878      	ldr	r0, [r7, #4]
+ 8000490:	f000 f828 	bl	80004e4 <HAL_TIMEx_CommutCallback>
+#endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
+    }
+  }
+}
+ 8000494:	bf00      	nop
+ 8000496:	3708      	adds	r7, #8
+ 8000498:	46bd      	mov	sp, r7
+ 800049a:	bd80      	pop	{r7, pc}
+
+0800049c <HAL_TIM_PeriodElapsedCallback>:
+  * @brief  Period elapsed callback in non-blocking mode
+  * @param  htim TIM handle
+  * @retval None
+  */
+__weak void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+ 800049c:	b480      	push	{r7}
+ 800049e:	b083      	sub	sp, #12
+ 80004a0:	af00      	add	r7, sp, #0
+ 80004a2:	6078      	str	r0, [r7, #4]
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_TIM_PeriodElapsedCallback could be implemented in the user file
+   */
+}
+ 80004a4:	bf00      	nop
+ 80004a6:	370c      	adds	r7, #12
+ 80004a8:	46bd      	mov	sp, r7
+ 80004aa:	bc80      	pop	{r7}
+ 80004ac:	4770      	bx	lr
+
+080004ae <HAL_TIM_OC_DelayElapsedCallback>:
+  * @brief  Output Compare callback in non-blocking mode
+  * @param  htim TIM OC handle
+  * @retval None
+  */
+__weak void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
+{
+ 80004ae:	b480      	push	{r7}
+ 80004b0:	b083      	sub	sp, #12
+ 80004b2:	af00      	add	r7, sp, #0
+ 80004b4:	6078      	str	r0, [r7, #4]
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_TIM_OC_DelayElapsedCallback could be implemented in the user file
+   */
+}
+ 80004b6:	bf00      	nop
+ 80004b8:	370c      	adds	r7, #12
+ 80004ba:	46bd      	mov	sp, r7
+ 80004bc:	bc80      	pop	{r7}
+ 80004be:	4770      	bx	lr
+
+080004c0 <HAL_TIM_PWM_PulseFinishedCallback>:
+  * @brief  PWM Pulse finished callback in non-blocking mode
+  * @param  htim TIM handle
+  * @retval None
+  */
+__weak void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+ 80004c0:	b480      	push	{r7}
+ 80004c2:	b083      	sub	sp, #12
+ 80004c4:	af00      	add	r7, sp, #0
+ 80004c6:	6078      	str	r0, [r7, #4]
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_TIM_PWM_PulseFinishedCallback could be implemented in the user file
+   */
+}
+ 80004c8:	bf00      	nop
+ 80004ca:	370c      	adds	r7, #12
+ 80004cc:	46bd      	mov	sp, r7
+ 80004ce:	bc80      	pop	{r7}
+ 80004d0:	4770      	bx	lr
+
+080004d2 <HAL_TIM_TriggerCallback>:
+  * @brief  Hall Trigger detection callback in non-blocking mode
+  * @param  htim TIM handle
+  * @retval None
+  */
+__weak void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
+{
+ 80004d2:	b480      	push	{r7}
+ 80004d4:	b083      	sub	sp, #12
+ 80004d6:	af00      	add	r7, sp, #0
+ 80004d8:	6078      	str	r0, [r7, #4]
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_TIM_TriggerCallback could be implemented in the user file
+   */
+}
+ 80004da:	bf00      	nop
+ 80004dc:	370c      	adds	r7, #12
+ 80004de:	46bd      	mov	sp, r7
+ 80004e0:	bc80      	pop	{r7}
+ 80004e2:	4770      	bx	lr
+
+080004e4 <HAL_TIMEx_CommutCallback>:
+  * @brief  Hall commutation changed callback in non-blocking mode
+  * @param  htim TIM handle
+  * @retval None
+  */
+__weak void HAL_TIMEx_CommutCallback(TIM_HandleTypeDef *htim)
+{
+ 80004e4:	b480      	push	{r7}
+ 80004e6:	b083      	sub	sp, #12
+ 80004e8:	af00      	add	r7, sp, #0
+ 80004ea:	6078      	str	r0, [r7, #4]
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_TIMEx_CommutCallback could be implemented in the user file
+   */
+}
+ 80004ec:	bf00      	nop
+ 80004ee:	370c      	adds	r7, #12
+ 80004f0:	46bd      	mov	sp, r7
+ 80004f2:	bc80      	pop	{r7}
+ 80004f4:	4770      	bx	lr
+
+080004f6 <HAL_TIMEx_BreakCallback>:
+  * @brief  Hall Break detection callback in non-blocking mode
+  * @param  htim TIM handle
+  * @retval None
+  */
+__weak void HAL_TIMEx_BreakCallback(TIM_HandleTypeDef *htim)
+{
+ 80004f6:	b480      	push	{r7}
+ 80004f8:	b083      	sub	sp, #12
+ 80004fa:	af00      	add	r7, sp, #0
+ 80004fc:	6078      	str	r0, [r7, #4]
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_TIMEx_BreakCallback could be implemented in the user file
+   */
+}
+ 80004fe:	bf00      	nop
+ 8000500:	370c      	adds	r7, #12
+ 8000502:	46bd      	mov	sp, r7
+ 8000504:	bc80      	pop	{r7}
+ 8000506:	4770      	bx	lr
+
+08000508 <__libc_init_array>:
+ 8000508:	b570      	push	{r4, r5, r6, lr}
+ 800050a:	2600      	movs	r6, #0
+ 800050c:	4d0c      	ldr	r5, [pc, #48]	; (8000540 <__libc_init_array+0x38>)
+ 800050e:	4c0d      	ldr	r4, [pc, #52]	; (8000544 <__libc_init_array+0x3c>)
+ 8000510:	1b64      	subs	r4, r4, r5
+ 8000512:	10a4      	asrs	r4, r4, #2
+ 8000514:	42a6      	cmp	r6, r4
+ 8000516:	d109      	bne.n	800052c <__libc_init_array+0x24>
+ 8000518:	f000 f81a 	bl	8000550 <_init>
+ 800051c:	2600      	movs	r6, #0
+ 800051e:	4d0a      	ldr	r5, [pc, #40]	; (8000548 <__libc_init_array+0x40>)
+ 8000520:	4c0a      	ldr	r4, [pc, #40]	; (800054c <__libc_init_array+0x44>)
+ 8000522:	1b64      	subs	r4, r4, r5
+ 8000524:	10a4      	asrs	r4, r4, #2
+ 8000526:	42a6      	cmp	r6, r4
+ 8000528:	d105      	bne.n	8000536 <__libc_init_array+0x2e>
+ 800052a:	bd70      	pop	{r4, r5, r6, pc}
+ 800052c:	f855 3b04 	ldr.w	r3, [r5], #4
+ 8000530:	4798      	blx	r3
+ 8000532:	3601      	adds	r6, #1
+ 8000534:	e7ee      	b.n	8000514 <__libc_init_array+0xc>
+ 8000536:	f855 3b04 	ldr.w	r3, [r5], #4
+ 800053a:	4798      	blx	r3
+ 800053c:	3601      	adds	r6, #1
+ 800053e:	e7f2      	b.n	8000526 <__libc_init_array+0x1e>
+ 8000540:	08000568 	.word	0x08000568
+ 8000544:	08000568 	.word	0x08000568
+ 8000548:	08000568 	.word	0x08000568
+ 800054c:	0800056c 	.word	0x0800056c
+
+08000550 <_init>:
+ 8000550:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 8000552:	bf00      	nop
+ 8000554:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 8000556:	bc08      	pop	{r3}
+ 8000558:	469e      	mov	lr, r3
+ 800055a:	4770      	bx	lr
+
+0800055c <_fini>:
+ 800055c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800055e:	bf00      	nop
+ 8000560:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 8000562:	bc08      	pop	{r3}
+ 8000564:	469e      	mov	lr, r3
+ 8000566:	4770      	bx	lr
