@@ -52,6 +52,10 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int time_index =0; //this is an index to count ms ticks
+extern int position_left;
+extern speed_left;
+int old_pos_left = 0;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -185,6 +189,15 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
+	time_index++; //need a base unit of time to calculate speed from
+				  //every index increment is 1ms
+
+	if(time_index == 1){	//something in it.c is changing the value of position left, need to adjust to keep it from solving an incorrect speed, use a temp variable?
+	position_left -= old_pos_left;	//position variable also overflows, need a case to adjust this to get proper speed in ticks/s
+	speed_left = position_left;		//the speed variable is not constant, position may not be updated properly
+	old_pos_left = position_left;
+	time_index= 0;
+	}
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();

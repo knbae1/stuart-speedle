@@ -71,6 +71,7 @@ int16_t enc_left_typeC;
 int16_t enc_right_typeC;
 int16_t position_left = 0;
 int16_t position_right = 0;
+int16_t speed_left =0;
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// this is the left encoder timer
 	/*if (htim->Instance == TIM3) {
