@@ -71,7 +71,7 @@ int16_t enc_left_typeC;
 int16_t enc_right_typeC;
 int16_t position_left = 0;
 int16_t position_right = 0;
-int16_t speed_left =0;
+extern speed_left;
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// this is the left encoder timer
 	/*if (htim->Instance == TIM3) {
@@ -80,12 +80,12 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM3) {
 		enc_left = __HAL_TIM_GET_COUNTER(htim);
 		enc_left_typeC = (int16_t)enc_left;
-		position_left =  -1*enc_left_typeC/30;
+		position_left =  -1*enc_left_typeC/360;
 	}
 	if (htim->Instance == TIM4) {
 		enc_right = __HAL_TIM_GET_COUNTER(htim);
 		enc_right_typeC = (int16_t)enc_right;
-		 position_right = -1*enc_right_typeC/30;
+		 position_right = -1*enc_right_typeC/360;
 	}
 
 }

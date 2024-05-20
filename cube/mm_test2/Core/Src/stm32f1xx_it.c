@@ -53,8 +53,11 @@
 /* USER CODE BEGIN 0 */
 
 int time_index =0; //this is an index to count ms ticks
-extern int position_left;
-extern speed_left;
+extern int position_left; //imports old position from main.c
+int temp_pos_left_1; 	// temp var to hold the value of old position before manipulating, ensures correct live expression
+int temp_pos_left_2;
+int16_t speed_left =0;	//imports calculated
+int new_pos_left = 0;
 int old_pos_left = 0;
 /* USER CODE END 0 */
 
@@ -189,15 +192,34 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-	time_index++; //need a base unit of time to calculate speed from
-				  //every index increment is 1ms
+ //need a base unit of time to calculate speed from
+//every index increment is 1ms
 
-	if(time_index == 1){	//something in it.c is changing the value of position left, need to adjust to keep it from solving an incorrect speed, use a temp variable?
-	position_left -= old_pos_left;	//position variable also overflows, need a case to adjust this to get proper speed in ticks/s
-	speed_left = position_left;		//the speed variable is not constant, position may not be updated properly
+	// move for loop to main to attempt again
+//	for(time_index =0; time_index<=1000;time_index++){
+//		if(time_index ==0){
+//				temp_pos_left_1 = position_left;
+//			}
+//
+//		if(time_index == 1000){
+//
+//			temp_pos_left_2 = position_left;
+//			//new_pos_left -= temp_pos_left; //position variable also overflows, need a case to adjust this to get proper speed in ticks/s
+//			speed_left = temp_pos_left_2 - temp_pos_left_1;		//the speed variable is not constant, position may not be updated properly
+//			time_index= 0; //reset time_index for new position tracking
+//			}
+//
+//
+//	}
+
+
+	speed_left = position_left - old_pos_left;
 	old_pos_left = position_left;
-	time_index= 0;
-	}
+
+	printf("%d", position_left);
+
+
+
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
