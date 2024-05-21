@@ -22,6 +22,13 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+typedef enum {
+	DIST_FL,
+	DIST_FR,
+	DIST_L,
+	DIST_R
+	}dist_t;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,6 +38,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+
 
 /* USER CODE END PD */
 
@@ -147,6 +156,99 @@ void move_fwd(uint32_t delay)
 
 	HAL_Delay(delay);
 }
+
+static void ADC1_Select_CH4(void){
+ADC_ChannelConfTypeDef sConfig = {0};
+		sConfig.Channel = ADC_CHANNEL_4;
+		sConfig.Rank = ADC_REGULAR_RANK_1;
+		sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
+		if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+		{
+			Error_Handler();
+		}
+	}
+
+
+static void ADC1_Select_CH9(void){
+		ADC_ChannelConfTypeDef sConfig = {0};
+			sConfig.Channel = ADC_CHANNEL_9;
+			sConfig.Rank = ADC_REGULAR_RANK_1;
+			sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
+			if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+			{
+				Error_Handler();
+			}
+	}
+
+static void ADC1_Select_CH5(void){
+		ADC_ChannelConfTypeDef sConfig = {0};
+			sConfig.Channel = ADC_CHANNEL_5;
+			sConfig.Rank = ADC_REGULAR_RANK_1;
+			sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
+			if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+			{
+				Error_Handler();
+			}
+	}
+static void ADC1_Select_CH8(void){
+		ADC_ChannelConfTypeDef sConfig = {0};
+			sConfig.Channel = ADC_CHANNEL_8;
+			sConfig.Rank = ADC_REGULAR_RANK_1;
+			sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
+			if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+			{
+				Error_Handler();
+			}
+	}
+
+uint16_t measure_dist(dist_t dist){
+	GPIO_TypeDef* emitter_port;
+	uint16_t emitter_pin;
+	GPIO_TypeDef* receiver_port;
+	uint16_t receiver_pin;
+	switch(dist) {
+	case DIST_FL:
+		emitter_port	= EMIT_FL_GPIO_Port; //assign ports to variables
+		emitter_pin		= EMIT_FL_Pin;	//assign pins to variables
+		receiver_port	= RECIV_FL_GPIO_Port;
+		receiver_pin 	= RECIV_FL_Pin;
+		ADC1_Select_CH9();
+		break;
+	case DIST_FR:
+			emitter_port	= EMIT_FR_GPIO_Port;
+			emitter_pin		= EMIT_FR_Pin;
+			receiver_port	= RECIV_FR_GPIO_Port;
+			receiver_pin 	= RECIV_FR_Pin;
+			ADC1_Select_CH4();
+			break;
+	case DIST_R:
+				emitter_port	= EMIT_R_GPIO_Port;
+				emitter_pin		= EMIT_R_Pin;
+				receiver_port	= RECIV_R_GPIO_Port;
+				receiver_pin 	= RECIV_R_Pin;
+				ADC1_Select_CH5();
+				break;
+	case DIST_L:
+					emitter_port	= EMIT_L_GPIO_Port;
+					emitter_pin		= EMIT_L_Pin;
+					receiver_port	= RECIV_L_GPIO_Port;
+					receiver_pin 	= RECIV_L_Pin;
+					ADC1_Select_CH8();
+					break;
+	default:
+			break;
+	}
+	HAL_GPIO_WritePin(emitter_port, emitter_pin, GPIO_PIN_SET); //this function enables us to write to a pin
+	HAL_Delay(5);
+	HAL_ADC_Start(&hadc1); //activate the ADC
+	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	uint16_t adc_val = HAL_ADC_GetValue(&hadc1);
+	HAL_ADC_Stop(&hadc1);
+	return adc_val;
+}
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -196,6 +298,12 @@ int main(void)
 
   while (1)
   {
+
+	  dis_FR = measure_dist(DIST_FR);
+	  dis_FL = measure_dist(DIST_FL);
+	  dis_R = measure_dist(DIST_R);
+	  dis_L = measure_dist(DIST_L);
+
 	  rotate_left(1000);
 
 	  rotate_right(2000);
@@ -353,13 +461,14 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 25;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
+  sConfigOC.Pulse = 1024;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();

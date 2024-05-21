@@ -195,25 +195,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-
-	time_index++;	//time variable to calculate distance
-
-	if(time_index == 1000){ //polls every one second for the speed calculation
-
-	current_pos_left = position_left;
-	speed_left = current_pos_left - old_pos_left;
-	old_pos_left = current_pos_left;
-	speed_left_cm = speed_left *(3.2); //converts rotations of the wheel to cm/s 1.25 in is about 3.2 cm
-
-	current_pos_right = position_right;
-	speed_right = current_pos_right - old_pos_right;
-	old_pos_right = current_pos_right;
-	speed_right_cm = speed_right * (3.2);
-
-	time_index = 0;
-	}
-
-
+  /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
