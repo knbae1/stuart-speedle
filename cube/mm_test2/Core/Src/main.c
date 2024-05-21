@@ -67,11 +67,13 @@ static void MX_TIM3_Init(void);
 
 uint16_t enc_left = 0;
 uint16_t enc_right = 0;
-int16_t enc_left_typeC;
+int16_t enc_left_typeC;	//typecasted encoder values
 int16_t enc_right_typeC;
-int16_t position_left = 0;
-int16_t position_right = 0;
-extern speed_left;
+int32_t position_left = 0; //changed to 32bit integer to prevent overflow, may need to typecast?
+int16_t speed_left =0;	//speed var for export
+int32_t position_right = 0;
+int16_t speed_right = 0; //speed var for export into it.c where speed is calculated
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// this is the left encoder timer
 	/*if (htim->Instance == TIM3) {
@@ -85,7 +87,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM4) {
 		enc_right = __HAL_TIM_GET_COUNTER(htim);
 		enc_right_typeC = (int16_t)enc_right;
-		 position_right = -1*enc_right_typeC/360;
+		position_right = -1*enc_right_typeC/360;
 	}
 
 }
@@ -194,17 +196,17 @@ int main(void)
 
   while (1)
   {
-	  //rotate_left(1000);
+	  rotate_left(1000);
 
-	  //rotate_right(2000);
+	  rotate_right(2000);
 
 	  //rotate_left(4000);
 
 	  //rotate_right(3000);
 
-	  //move_fwd(6000);
+	  //move_fwd(2000);
 
-	  move_bwd(2000);
+	  //move_bwd(2000);
 
     /* USER CODE END WHILE */
 

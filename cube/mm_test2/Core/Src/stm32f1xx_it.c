@@ -54,11 +54,15 @@
 
 int time_index =0; //this is an index to count ms ticks
 extern int position_left; //imports old position from main.c
-int temp_pos_left_1; 	// temp var to hold the value of old position before manipulating, ensures correct live expression
-int temp_pos_left_2;
-int16_t speed_left =0;	//imports calculated
-int new_pos_left = 0;
+extern int position_right;
+extern int speed_left;
+extern int speed_right;
+int current_pos_left = 0;
+int current_pos_right = 0;
 int old_pos_left = 0;
+int old_pos_right = 0;
+float speed_left_cm = 0;
+float speed_right_cm = 0;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -191,33 +195,23 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-  /* USER CODE BEGIN SysTick_IRQn 0 */
- //need a base unit of time to calculate speed from
-//every index increment is 1ms
 
-	// move for loop to main to attempt again
-//	for(time_index =0; time_index<=1000;time_index++){
-//		if(time_index ==0){
-//				temp_pos_left_1 = position_left;
-//			}
-//
-//		if(time_index == 1000){
-//
-//			temp_pos_left_2 = position_left;
-//			//new_pos_left -= temp_pos_left; //position variable also overflows, need a case to adjust this to get proper speed in ticks/s
-//			speed_left = temp_pos_left_2 - temp_pos_left_1;		//the speed variable is not constant, position may not be updated properly
-//			time_index= 0; //reset time_index for new position tracking
-//			}
-//
-//
-//	}
+	time_index++;	//time variable to calculate distance
 
+	if(time_index == 1000){ //polls every one second for the speed calculation
 
-	speed_left = position_left - old_pos_left;
-	old_pos_left = position_left;
+	current_pos_left = position_left;
+	speed_left = current_pos_left - old_pos_left;
+	old_pos_left = current_pos_left;
+	speed_left_cm = speed_left *(3.2); //converts rotations of the wheel to cm/s 1.25 in is about 3.2 cm
 
-	printf("%d", position_left);
+	current_pos_right = position_right;
+	speed_right = current_pos_right - old_pos_right;
+	old_pos_right = current_pos_right;
+	speed_right_cm = speed_right * (3.2);
 
+	time_index = 0;
+	}
 
 
 
