@@ -83,6 +83,12 @@ int16_t speed_left =0;	//speed var for export
 int32_t position_right = 0;
 int16_t speed_right = 0; //speed var for export into it.c where speed is calculated
 
+//var's for distance from IR sensors
+int16_t dis_FR = 0;
+int16_t dis_FL = 0;
+int16_t dis_L = 0;
+int16_t dis_R = 0;
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// this is the left encoder timer
 	/*if (htim->Instance == TIM3) {
@@ -304,9 +310,19 @@ int main(void)
 	  dis_R = measure_dist(DIST_R);
 	  dis_L = measure_dist(DIST_L);
 
-	  rotate_left(1000);
+	  move_fwd(1000);
 
-	  rotate_right(2000);
+	  if(dis_FL>1 || dis_L>1){
+		  move_bwd(0300);
+		  rotate_right(0300);
+		  move_fwd(0300);
+
+	  }
+
+
+	  //rotate_left(1000);
+
+	  //rotate_right(2000);
 
 	  //rotate_left(4000);
 
