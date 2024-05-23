@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stdbool.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -88,7 +89,10 @@ int16_t dis_FR = 0;
 int16_t dis_FL = 0;
 int16_t dis_L = 0;
 int16_t dis_R = 0;
+_Bool a = false;
 
+
+//function to obtain encoder values and convert them ro encoder revolutions
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// this is the left encoder timer
 	/*if (htim->Instance == TIM3) {
@@ -107,6 +111,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 }
 
+//functions to move the mouse in specific directions
 void rotate_right(uint32_t delay)
 {
 	  TIM2->CCR4 = 1300;
@@ -163,6 +168,26 @@ void move_fwd(uint32_t delay)
 	HAL_Delay(delay);
 }
 
+//functions to move the mouse based on IR RX readings
+void avoid_front_wall(){
+
+	 if(dis_L>100 && dis_R>100){
+
+			  move_bwd(1000);
+			  rotate_right(750);		//want to rotate right for left wall following mouse, will need to undo this when leaving the maze
+			  move_fwd(1000);
+			  a = true;
+
+		  }
+	 else{
+		 a = false;
+	 }
+
+}
+
+
+
+//functions to select and initialize adc CHANNELS
 static void ADC1_Select_CH4(void){
 ADC_ChannelConfTypeDef sConfig = {0};
 		sConfig.Channel = ADC_CHANNEL_4;
@@ -247,7 +272,7 @@ uint16_t measure_dist(dist_t dist){
 	HAL_GPIO_WritePin(emitter_port, emitter_pin, GPIO_PIN_SET); //this function enables us to write to a pin
 	HAL_Delay(5);
 	HAL_ADC_Start(&hadc1); //activate the ADC
-	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	HAL_ADC_PollForConversion(&hadc1, 400);
 	uint16_t adc_val = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 	return adc_val;
@@ -310,14 +335,10 @@ int main(void)
 	  dis_R = measure_dist(DIST_R);
 	  dis_L = measure_dist(DIST_L);
 
-	  move_fwd(1000);
 
-	  if(dis_FL>1 || dis_L>1){
-		  move_bwd(0300);
-		  rotate_right(0300);
-		  move_fwd(0300);
+	  avoid_front_wall();
 
-	  }
+
 
 
 	  //rotate_left(1000);

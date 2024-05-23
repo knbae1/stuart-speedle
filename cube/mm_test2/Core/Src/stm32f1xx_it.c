@@ -196,6 +196,24 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
+	time_index++;
+
+	if(time_index == 1000){
+		current_pos_left = position_left;
+		speed_left = current_pos_left - old_pos_left;
+		speed_left_cm = speed_left*(3.175);
+		old_pos_left = position_left;
+
+		current_pos_right = position_right;
+		speed_right = current_pos_right - old_pos_right;
+		speed_right_cm = speed_right *(3.175);
+		old_pos_right = position_right;
+
+		time_index = 0;
+
+
+	}
+
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
