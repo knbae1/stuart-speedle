@@ -15,10 +15,11 @@
   *
   ******************************************************************************
   */
+#include "stdbool.h"
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stdbool.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -77,8 +78,8 @@ static void MX_TIM3_Init(void);
 
 uint16_t enc_left = 0;
 uint16_t enc_right = 0;
-int16_t enc_left_typeC =0;	//typecasted encoder values
-int16_t enc_right_typeC =0;
+int16_t enc_left_typeC = 0;	//type-casted encoder values
+int16_t enc_right_typeC = 0;
 int32_t position_left = 0; //changed to 32bit integer to prevent overflow, may need to typecast?
 int16_t speed_left =0;	//speed var for export
 int32_t position_right = 0;
@@ -90,12 +91,18 @@ uint16_t goal_angle = 0;
 uint16_t angle_from_enc_error = 0;
 
 //P and D variables for PID loop for encoders
-extern encoder_derivative;
-extern encoder_integral;
-extern enc_Kp;
-extern enc_Ki;
-extern enc_Kd;
-extern enc_control_signal;
+int enc_error_current = 0;
+int enc_error_past = 0;
+int encoder_derivative = 0;
+int encoder_integral = 0;
+float enc_Kp = 1;
+float enc_Ki = 0;
+float enc_Kd = 0;
+float enc_control_signal = 0;
+
+
+
+
 
 //var's for distance from IR sensors
 int16_t dis_FR = 0;
@@ -126,7 +133,17 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 		enc_right = __HAL_TIM_GET_COUNTER(htim);
 		enc_right_typeC = (int16_t)enc_right*(-1);
 		position_right = enc_right_typeC/360;
+
 	}
+
+
+	enc_error_current = enc_left_typeC - enc_right_typeC;	//consider moving into SYS tick handler to use interrupts to calculate errors
+	encoder_derivative = enc_error_current - enc_error_past; //settles around 0?? sum of errors
+	encoder_integral += enc_error_current;
+	enc_control_signal = enc_Kd*encoder_derivative + enc_Ki*encoder_integral + enc_Kp*enc_error_current;
+
+	enc_error_past = enc_error_current;
+
 
 
 
@@ -353,6 +370,14 @@ int main(void)
 
 		  }
 
+	  }
+
+	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_14) == GPIO_PIN_RESET){
+
+	 			  move_bwd(1000);
+
+	 		  }
+
 
 		  //rotate_right(1000);
 		  //rotate_left(1000);
@@ -365,7 +390,7 @@ int main(void)
 		  //a = false;
 
 
-	  }
+
 
 	  //avoid_front_wall();
 
@@ -680,6 +705,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : Button_2_Pin */
+  GPIO_InitStruct.Pin = Button_2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(Button_2_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : EMIT_R_Pin EMIT_L_Pin EMIT_FL_Pin MR_FWD_Pin
                            ML_BWD_Pin MR_BWD_Pin EMIT_FR_Pin */
   GPIO_InitStruct.Pin = EMIT_R_Pin|EMIT_L_Pin|EMIT_FL_Pin|MR_FWD_Pin
@@ -708,11 +739,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PUSH_BUTTON_Pin */
-  GPIO_InitStruct.Pin = PUSH_BUTTON_Pin;
+  /*Configure GPIO pin : Button_1_Pin */
+  GPIO_InitStruct.Pin = Button_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(PUSH_BUTTON_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(Button_1_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
