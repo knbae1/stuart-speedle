@@ -101,12 +101,12 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM3) {
 		enc_left = __HAL_TIM_GET_COUNTER(htim);
 		enc_left_typeC = (int16_t)enc_left;
-		position_left =  -1*enc_left_typeC/360;
+		position_left =  enc_left_typeC/360;
 	}
 	if (htim->Instance == TIM4) {
 		enc_right = __HAL_TIM_GET_COUNTER(htim);
 		enc_right_typeC = (int16_t)enc_right;
-		position_right = -1*enc_right_typeC/360;
+		position_right = enc_right_typeC/360;
 	}
 
 }
@@ -176,13 +176,7 @@ void avoid_front_wall(){
 			  move_bwd(1000);
 			  rotate_right(750);		//want to rotate right for left wall following mouse, will need to undo this when leaving the maze
 			  move_fwd(1000);
-			  a = true;
-
-		  }
-	 else{
-		 a = false;
 	 }
-
 }
 
 
@@ -272,7 +266,7 @@ uint16_t measure_dist(dist_t dist){
 	HAL_GPIO_WritePin(emitter_port, emitter_pin, GPIO_PIN_SET); //this function enables us to write to a pin
 	HAL_Delay(5);
 	HAL_ADC_Start(&hadc1); //activate the ADC
-	HAL_ADC_PollForConversion(&hadc1, 400);
+	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
 	uint16_t adc_val = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 	return adc_val;
@@ -329,19 +323,32 @@ int main(void)
 
   while (1)
   {
-
+	  //calls to measure distance FR,FL,L,R can adjust delay in timing function to make the IR sensors more responsive
 	  dis_FR = measure_dist(DIST_FR);
 	  dis_FL = measure_dist(DIST_FL);
 	  dis_R = measure_dist(DIST_R);
 	  dis_L = measure_dist(DIST_L);
 
 
-	  avoid_front_wall();
+
+	  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET){ //code for reading a button input/output
+
+		  rotate_left(1000);
+		  HAL_Delay(500);
+		  a = true;
+
+		  HAL_Delay(500);
+		  a = false;
+
+
+	  }
+
+	  //avoid_front_wall();
 
 
 
 
-	  //rotate_left(1000);
+
 
 	  //rotate_right(2000);
 
@@ -676,6 +683,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PUSH_BUTTON_Pin */
+  GPIO_InitStruct.Pin = PUSH_BUTTON_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(PUSH_BUTTON_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
