@@ -77,12 +77,25 @@ static void MX_TIM3_Init(void);
 
 uint16_t enc_left = 0;
 uint16_t enc_right = 0;
-int16_t enc_left_typeC;	//typecasted encoder values
-int16_t enc_right_typeC;
+int16_t enc_left_typeC =0;	//typecasted encoder values
+int16_t enc_right_typeC =0;
 int32_t position_left = 0; //changed to 32bit integer to prevent overflow, may need to typecast?
 int16_t speed_left =0;	//speed var for export
 int32_t position_right = 0;
 int16_t speed_right = 0; //speed var for export into it.c where speed is calculated
+
+//var for angle error control loop
+
+uint16_t goal_angle = 0;
+uint16_t angle_from_enc_error = 0;
+
+//P and D variables for PID loop for encoders
+extern encoder_derivative;
+extern encoder_integral;
+extern enc_Kp;
+extern enc_Ki;
+extern enc_Kd;
+extern enc_control_signal;
 
 //var's for distance from IR sensors
 int16_t dis_FR = 0;
@@ -91,6 +104,12 @@ int16_t dis_L = 0;
 int16_t dis_R = 0;
 _Bool a = false;
 
+//function for PD controller for distance
+	//void PD_angle_controller(){	//will also need an distance controller
+		//encoder_derivative = enc_error_current - enc_error_past;
+
+
+//}
 
 //function to obtain encoder values and convert them ro encoder revolutions
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
@@ -100,19 +119,24 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 }*/
 	if (htim->Instance == TIM3) {
 		enc_left = __HAL_TIM_GET_COUNTER(htim);
-		enc_left_typeC = (int16_t)enc_left;
+		enc_left_typeC = (int16_t)enc_left*(-1);
 		position_left =  enc_left_typeC/360;
 	}
 	if (htim->Instance == TIM4) {
 		enc_right = __HAL_TIM_GET_COUNTER(htim);
-		enc_right_typeC = (int16_t)enc_right;
+		enc_right_typeC = (int16_t)enc_right*(-1);
 		position_right = enc_right_typeC/360;
 	}
 
+
+
 }
 
+
+
+
 //functions to move the mouse in specific directions
-void rotate_right(uint32_t delay)
+void move_bwd(uint32_t delay)
 {
 	  TIM2->CCR4 = 1300;
 	  TIM2 ->CCR3 = 1300;
@@ -126,7 +150,7 @@ void rotate_right(uint32_t delay)
 
 }
 
-void rotate_left(uint32_t delay)
+void move_fwd(uint32_t delay)
 {
 	TIM2->CCR4 = 1300;
 	TIM2 ->CCR3 = 1300;
@@ -140,7 +164,7 @@ void rotate_left(uint32_t delay)
 	HAL_Delay(delay);
 }
 
-void move_bwd(uint32_t delay)
+void rotate_right(uint32_t delay)
 {
 	TIM2->CCR4 = 1300;
 	TIM2 ->CCR3 = 1300;
@@ -154,7 +178,7 @@ void move_bwd(uint32_t delay)
 	HAL_Delay(delay);
 }
 
-void move_fwd(uint32_t delay)
+void rotate_left(uint32_t delay)
 {
 	TIM2->CCR4 = 1300;
 	TIM2 ->CCR3 = 1300;
@@ -168,16 +192,6 @@ void move_fwd(uint32_t delay)
 	HAL_Delay(delay);
 }
 
-//functions to move the mouse based on IR RX readings
-void avoid_front_wall(){
-
-	 if(dis_L>100 && dis_R>100){
-
-			  move_bwd(1000);
-			  rotate_right(750);		//want to rotate right for left wall following mouse, will need to undo this when leaving the maze
-			  move_fwd(1000);
-	 }
-}
 
 
 
@@ -333,12 +347,22 @@ int main(void)
 
 	  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET){ //code for reading a button input/output
 
-		  rotate_left(1000);
-		  HAL_Delay(500);
-		  a = true;
 
-		  HAL_Delay(500);
-		  a = false;
+		  while( position_left<50 && position_right<50){
+			  move_fwd(1000);
+
+		  }
+
+
+		  //rotate_right(1000);
+		  //rotate_left(1000);
+
+		 // move_bwd(1000);
+		  //HAL_Delay(500);
+		  //a = true;
+
+		  //HAL_Delay(500);
+		  //a = false;
 
 
 	  }

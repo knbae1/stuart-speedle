@@ -57,12 +57,26 @@ extern int position_left; //imports old position from main.c
 extern int position_right;
 extern int speed_left;
 extern int speed_right;
+extern enc_left_typeC;	//typecasted encoder values
+extern enc_right_typeC;
 int current_pos_left = 0;
 int current_pos_right = 0;
 int old_pos_left = 0;
 int old_pos_right = 0;
 float speed_left_cm = 0;
 float speed_right_cm = 0;
+
+
+//P and D variables for PID loop for encoders
+int16_t enc_error_current =0;
+int16_t enc_error_past =0;
+int32_t encoder_derivative =0;
+int32_t encoder_integral =0;
+float enc_Kp = 1;
+float enc_Ki = 0;
+float enc_Kd = 0;
+float enc_control_signal =0;
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -201,15 +215,26 @@ void SysTick_Handler(void)
 	if(time_index == 1000){
 		current_pos_left = position_left;
 		speed_left = current_pos_left - old_pos_left;
-		speed_left_cm = speed_left*(3.175);
+		speed_left_cm = speed_left*(10); //includes pi approximation and conversion of inches to cm
 		old_pos_left = position_left;
 
 		current_pos_right = position_right;
 		speed_right = current_pos_right - old_pos_right;
-		speed_right_cm = speed_right *(3.175);
+		speed_right_cm = speed_right *(10); //converts in to mm and converts rotations/s to circumferences(distance)/s
 		old_pos_right = position_right;
 
+
+		enc_error_current =  enc_left_typeC - enc_right_typeC;	//consider moving into SYS tick handler to use interrupts to calculate errors
+		enc_error_past = enc_error_current;
+
+		encoder_derivative = enc_error_current - enc_error_past; //settles around 0?? sum of errors
+		encoder_integral += enc_error_current;
+		enc_control_signal = enc_Kd*encoder_derivative + enc_Ki*encoder_integral + enc_Kp*enc_error_current;
+
+
 		time_index = 0;
+
+
 
 
 	}
