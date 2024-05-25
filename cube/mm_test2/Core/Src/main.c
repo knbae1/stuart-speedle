@@ -84,11 +84,14 @@ int32_t position_left = 0; //changed to 32bit integer to prevent overflow, may n
 int16_t speed_left =0;	//speed var for export
 int32_t position_right = 0;
 int16_t speed_right = 0; //speed var for export into it.c where speed is calculated
+extern float speed_diff_left_cm;
+
 
 //var for angle error control loop
-
 uint16_t goal_angle = 0;
 uint16_t angle_from_enc_error = 0;
+uint16_t target_speed_left = 50;
+uint16_t target_speed_right = 50;
 
 //P and D variables for PID loop for encoders
 int enc_error_current = 0;
@@ -149,11 +152,15 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 }
 
-
+uint32_t calculatePWM(uint32_t)
+{
+	//given a goal speed, return the value to set CCR4/CCR3
+	return 0;
+}
 
 
 //functions to move the mouse in specific directions
-void move_bwd(uint32_t delay)
+void move_bwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 {
 	  TIM2->CCR4 = 1300;
 	  TIM2 ->CCR3 = 1300;
@@ -167,10 +174,10 @@ void move_bwd(uint32_t delay)
 
 }
 
-void move_fwd(uint32_t delay)
+void move_fwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)	//need a parameter to adjust TIM2 CCR4/3 and pass to while loop
 {
-	TIM2->CCR4 = 1300;
-	TIM2 ->CCR3 = 1300;
+	TIM2->CCR4 = Lspeed;
+	TIM2 ->CCR3 = Rspeed;
 	//bwd
 	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
 	HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 1);	//mlbwd low
@@ -181,7 +188,7 @@ void move_fwd(uint32_t delay)
 	HAL_Delay(delay);
 }
 
-void rotate_right(uint32_t delay)
+void rotate_right(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 {
 	TIM2->CCR4 = 1300;
 	TIM2 ->CCR3 = 1300;
@@ -195,10 +202,11 @@ void rotate_right(uint32_t delay)
 	HAL_Delay(delay);
 }
 
-void rotate_left(uint32_t delay)
+void rotate_left(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 {
-	TIM2->CCR4 = 1300;
-	TIM2 ->CCR3 = 1300;
+
+	TIM2->CCR4 = calculatePWM(Lspeed);
+	TIM2 ->CCR3 = calculatePWM(Rspeed);
 	//bwd
 	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 1); // ml fwd high
 	HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 0);	//mlbwd low
@@ -364,17 +372,17 @@ int main(void)
 
 	  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET){ //code for reading a button input/output
 
+		  	  if (speed_diff_left_cm == 0) move_fwd(1000, 1800, 1800);
+			  if (speed_diff_left_cm > 0)
+				  move_fwd(500, 1300, 1800);
+			  else if (speed_diff_left_cm < 0) move_fwd(500, 2200, 1800);
 
-		  while( position_left<50 && position_right<50){
-			  move_fwd(1000);
-
-		  }
 
 	  }
 
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_14) == GPIO_PIN_RESET){
 
-	 			  move_bwd(1000);
+	 			  //move_bwd(1000);
 
 	 		  }
 

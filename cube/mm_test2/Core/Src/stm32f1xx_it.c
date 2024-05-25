@@ -52,7 +52,7 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int time_index =0; //this is an index to count ms ticks
+int time_index = 0; //this is an index to count ms ticks
 extern int position_left; //imports old position from main.c
 extern int position_right;
 extern int speed_left;
@@ -61,9 +61,12 @@ int current_pos_left = 0;
 int current_pos_right = 0;
 int old_pos_left = 0;
 int old_pos_right = 0;
-float speed_left_cm = 0;
-float speed_right_cm = 0;
-
+float current_speed_left_cm = 0;
+float current_speed_right_cm = 0;
+float old_speed_left_cm = 0;
+float old_speed_right_cm = 0;
+float speed_diff_left_cm = 0;
+float speed_diff_right_cm = 0;
 
 /* USER CODE END 0 */
 
@@ -203,14 +206,18 @@ void SysTick_Handler(void)
 	if(time_index == 1000){
 		current_pos_left = position_left;
 		speed_left = current_pos_left - old_pos_left;
-		speed_left_cm = speed_left*(10); //includes pi approximation and conversion of inches to cm
+		current_speed_left_cm = speed_left*(10); //includes pi approximation and conversion of inches to cm
 		old_pos_left = position_left;
+		speed_diff_left_cm = current_speed_left_cm - old_speed_left_cm;
+		old_speed_left_cm = current_speed_left_cm;
 
 		current_pos_right = position_right;
 		speed_right = current_pos_right - old_pos_right;
-		speed_right_cm = speed_right *(10); //converts in to mm and converts rotations/s to circumferences(distance)/s
+		current_speed_right_cm = speed_right *(10); //converts in to mm and converts rotations/s to circumferences(distance)/s
 		old_pos_right = position_right;
 
+		speed_diff_right_cm = current_speed_right_cm - old_speed_right_cm;
+		old_speed_right_cm = current_speed_right_cm;
 
 		time_index = 0;
 
