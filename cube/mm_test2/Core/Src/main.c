@@ -90,8 +90,8 @@ extern float speed_diff_left_cm;
 //var for angle error control loop
 uint16_t goal_angle = 0;
 uint16_t angle_from_enc_error = 0;
-uint16_t target_speed_left = 50;
-uint16_t target_speed_right = 50;
+float target_speed_left = 0;
+float target_speed_right = 0;
 
 //P and D variables for PID loop for encoders
 int enc_error_current = 0;
@@ -103,8 +103,9 @@ float enc_Ki = 0;
 float enc_Kd = 0;
 float enc_control_signal = 0;
 
-
-
+//var for battery voltage reading
+uint16_t battery_volt = 0;
+uint16_t battery_volt_analog = 0;
 
 
 //var's for distance from IR sensors
@@ -158,6 +159,13 @@ uint32_t calculatePWM(uint32_t)
 	return 0;
 }
 
+//float desired_speed_vs_duty_cycle(){
+		//target_speed_right_slope = (TIM2->CCCR3)/current_speed_left_cm;
+		//target_speed_left_slope = (TIM2->CCR4)/current_speed_right_cm;
+
+
+//}
+
 
 //functions to move the mouse in specific directions
 void move_bwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
@@ -176,7 +184,7 @@ void move_bwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 
 void move_fwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)	//need a parameter to adjust TIM2 CCR4/3 and pass to while loop
 {
-	TIM2->CCR4 = Lspeed;
+	TIM2->CCR4 = Lspeed;	//2047 is the max
 	TIM2 ->CCR3 = Rspeed;
 	//bwd
 	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
@@ -218,9 +226,21 @@ void rotate_left(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 }
 
 
-
-
 //functions to select and initialize adc CHANNELS
+
+//ADC for battery reading
+static void ADC1_Select_CH1(void){
+ADC_ChannelConfTypeDef sConfig = {0};
+		sConfig.Channel = ADC_CHANNEL_1;
+		sConfig.Rank = ADC_REGULAR_RANK_1;
+		sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
+		if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+		{
+			Error_Handler();
+		}
+	}
+
+
 static void ADC1_Select_CH4(void){
 ADC_ChannelConfTypeDef sConfig = {0};
 		sConfig.Channel = ADC_CHANNEL_4;
@@ -264,6 +284,17 @@ static void ADC1_Select_CH8(void){
 				Error_Handler();
 			}
 	}
+
+uint16_t measure_battery_voltage(){
+		ADC1_Select_CH1();
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		battery_volt = HAL_ADC_GetValue(&hadc1); //raw ADC value for battery voltage
+		HAL_ADC_Stop(&hadc1);
+		battery_volt_analog = battery_volt*(3.3/4095); //conversion factor for ADC reading to an analog voltage
+		return battery_volt_analog;	//at 7.2V ADC value should be between 2400 and 4000
+		//7.22 is current voltage, R23 =10KOHM R22= 20KOHM, voltage at ADC should be 1/3 of battery voltage
+}
 
 uint16_t measure_dist(dist_t dist){
 	GPIO_TypeDef* emitter_port;
@@ -368,14 +399,30 @@ int main(void)
 	  dis_R = measure_dist(DIST_R);
 	  dis_L = measure_dist(DIST_L);
 
+	  measure_battery_voltage();
+
 
 
 	  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET){ //code for reading a button input/output
 
-		  	  if (speed_diff_left_cm == 0) move_fwd(1000, 1800, 1800);
-			  if (speed_diff_left_cm > 0)
-				  move_fwd(500, 1300, 1800);
-			  else if (speed_diff_left_cm < 0) move_fwd(500, 2200, 1800);
+
+		  	  //move_fwd(5000,1000,1000);40
+		  	  //move_fwd(5000,1100,1100);50
+		  	  //move_fwd(5000,1200,1200);60
+		  	  //move_fwd(5000,1300,1300);70
+		  	  //move_fwd(5000,1400,1400);80
+		  	  //move_fwd(5000,1500,1500);90
+		  	  //move_fwd(5000,1600,1600);100
+		  	  //move_fwd(5000,1700,1700);120
+		  	  //move_fwd(5000,1800,1800);140
+		  	  //move_fwd(5000,1900,1900);160
+
+		  	  //if (speed_diff_left_cm == 0) move_fwd(1000, 1800, 1800);
+			  //if (speed_diff_left_cm > 0){
+				//  move_fwd(500, 0000, 1800);
+			  	  //move_fwd(1000, 1800, 1800);
+			  //}
+			  //else if (speed_diff_left_cm < 0) move_fwd(500, 2200, 1800);
 
 
 	  }

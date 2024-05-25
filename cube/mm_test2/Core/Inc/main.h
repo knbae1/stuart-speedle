@@ -61,6 +61,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define Button_2_Pin GPIO_PIN_14
 #define Button_2_GPIO_Port GPIOC
+#define Battery_Reader_Pin GPIO_PIN_1
+#define Battery_Reader_GPIO_Port GPIOA
 #define MR_PWM_Pin GPIO_PIN_2
 #define MR_PWM_GPIO_Port GPIOA
 #define ML_PWM_Pin GPIO_PIN_3
