@@ -104,8 +104,9 @@ float enc_Kd = 0;
 float enc_control_signal = 0;
 
 //var for battery voltage reading
-uint16_t battery_volt = 0;
-uint16_t battery_volt_analog = 0;
+uint16_t battery_volt_reading = 0;
+float battery_volt_intitial = 0;
+float battery_volt_analog = 0;
 
 
 //var's for distance from IR sensors
@@ -226,6 +227,10 @@ void rotate_left(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 }
 
 
+
+
+
+
 //functions to select and initialize adc CHANNELS
 
 //ADC for battery reading
@@ -274,6 +279,7 @@ static void ADC1_Select_CH5(void){
 				Error_Handler();
 			}
 	}
+
 static void ADC1_Select_CH8(void){
 		ADC_ChannelConfTypeDef sConfig = {0};
 			sConfig.Channel = ADC_CHANNEL_8;
@@ -285,16 +291,7 @@ static void ADC1_Select_CH8(void){
 			}
 	}
 
-uint16_t measure_battery_voltage(){
-		ADC1_Select_CH1();
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-		battery_volt = HAL_ADC_GetValue(&hadc1); //raw ADC value for battery voltage
-		HAL_ADC_Stop(&hadc1);
-		battery_volt_analog = battery_volt*(3.3/4095); //conversion factor for ADC reading to an analog voltage
-		return battery_volt_analog;	//at 7.2V ADC value should be between 2400 and 4000
-		//7.22 is current voltage, R23 =10KOHM R22= 20KOHM, voltage at ADC should be 1/3 of battery voltage
-}
+
 
 uint16_t measure_dist(dist_t dist){
 	GPIO_TypeDef* emitter_port;
@@ -342,6 +339,14 @@ uint16_t measure_dist(dist_t dist){
 	return adc_val;
 }
 
+uint16_t measure_battery_voltage(){
+		ADC1_Select_CH1();
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		battery_volt_reading = HAL_ADC_GetValue(&hadc1); //raw ADC value for battery voltage
+		return battery_volt_reading;	//at 7.2V ADC value should be between 2400 and 4000
+		//7.22 is current voltage, R23 =10KOHM R22= 20KOHM, voltage at ADC should be 1/3 of battery voltage
+}
 
 
 /* USER CODE END 0 */
@@ -393,13 +398,14 @@ int main(void)
 
   while (1)
   {
+	  battery_volt_analog = battery_volt_reading *(9/4096); //conversion factor for ADC reading to an analog voltage
 	  //calls to measure distance FR,FL,L,R can adjust delay in timing function to make the IR sensors more responsive
 	  dis_FR = measure_dist(DIST_FR);
 	  dis_FL = measure_dist(DIST_FL);
 	  dis_R = measure_dist(DIST_R);
 	  dis_L = measure_dist(DIST_L);
 
-	  measure_battery_voltage();
+	  battery_volt_analog = measure_battery_voltage();
 
 
 

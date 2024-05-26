@@ -109,7 +109,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     PB0     ------> ADC1_IN8
     PB1     ------> ADC1_IN9
     */
-    GPIO_InitStruct.Pin = Battery_Reader_Pin|RECIV_FR_Pin|RECIV_R_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_1|RECIV_FR_Pin|RECIV_R_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -147,7 +147,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     PB0     ------> ADC1_IN8
     PB1     ------> ADC1_IN9
     */
-    HAL_GPIO_DeInit(GPIOA, Battery_Reader_Pin|RECIV_FR_Pin|RECIV_R_Pin);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|RECIV_FR_Pin|RECIV_R_Pin);
 
     HAL_GPIO_DeInit(GPIOB, RECIV_L_Pin|RECIV_FL_Pin);
 
