@@ -16,7 +16,8 @@
   ******************************************************************************
   */
 #include "stdbool.h"
-
+#include "stdio.h"
+#include "stdlib.h"
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -30,6 +31,7 @@ typedef enum {
 	DIST_L,
 	DIST_R
 	}dist_t;
+
 
 /* USER CODE END Includes */
 
@@ -74,7 +76,8 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int32_t MAXCOST = 255;
+_Bool on = false;
 
 uint16_t enc_left = 0;
 uint16_t enc_right = 0;
@@ -90,8 +93,8 @@ extern float speed_diff_left_cm;
 //var for angle error control loop
 uint16_t goal_angle = 0;
 uint16_t angle_from_enc_error = 0;
-float target_speed_left = 0;
-float target_speed_right = 0;
+uint16_t target_speed_left = 50;
+uint16_t target_speed_right = 50;
 
 //P and D variables for PID loop for encoders
 int enc_error_current = 0;
@@ -103,10 +106,8 @@ float enc_Ki = 0;
 float enc_Kd = 0;
 float enc_control_signal = 0;
 
-//var for battery voltage reading
-uint16_t battery_volt_reading = 0;
-float battery_volt_intitial = 0;
-float battery_volt_analog = 0;
+
+
 
 
 //var's for distance from IR sensors
@@ -154,25 +155,33 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 }
 
+// API EQUIVALENT FUNCTIONS START
+
 uint32_t calculatePWM(uint32_t)
 {
 	//given a goal speed, return the value to set CCR4/CCR3
 	return 0;
 }
 
-//float desired_speed_vs_duty_cycle(){
-		//target_speed_right_slope = (TIM2->CCCR3)/current_speed_left_cm;
-		//target_speed_left_slope = (TIM2->CCR4)/current_speed_right_cm;
+_Bool wallFront()
+{
+	return (dis_FR > 200 && dis_FL > 200);
+}
 
+_Bool wallRight()
+{
+	return dis_R > 200;
+}
 
-//}
+_Bool wallLeft()
+{
+	return dis_L > 200;
+}
 
-
-//functions to move the mouse in specific directions
 void move_bwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 {
-	  TIM2->CCR4 = 1300;
-	  TIM2 ->CCR3 = 1300;
+	  TIM2->CCR4 = Lspeed;
+	  TIM2 ->CCR3 = Rspeed;
 
 	  HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 1); // ml fwd high
 	  HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 0);	//mlbwd low
@@ -180,12 +189,16 @@ void move_bwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 	  HAL_GPIO_WritePin(MR_FWD_GPIO_Port, MR_FWD_Pin, 1); //mr fwd high
 	  HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 0);
 	  HAL_Delay(delay);
+	  TIM2->CCR4 = 0;
+	  	TIM2 ->CCR3 = 0;
 
 }
 
+
+
 void move_fwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)	//need a parameter to adjust TIM2 CCR4/3 and pass to while loop
 {
-	TIM2->CCR4 = Lspeed;	//2047 is the max
+	TIM2->CCR4 = Lspeed;
 	TIM2 ->CCR3 = Rspeed;
 	//bwd
 	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
@@ -195,12 +208,14 @@ void move_fwd(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)	//need a paramet
 	HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 1);
 
 	HAL_Delay(delay);
+	TIM2->CCR4 = 0;
+	TIM2 ->CCR3 = 0;
 }
 
-void rotate_right(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
+void rotate_right(uint32_t delay, uint32_t speed)
 {
-	TIM2->CCR4 = 1300;
-	TIM2 ->CCR3 = 1300;
+	TIM2->CCR4 = speed;
+	TIM2 ->CCR3 = speed;
 	//bwd
 	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 0); // ml fwd high
 	HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 1);	//mlbwd low
@@ -209,13 +224,15 @@ void rotate_right(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 	HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 0);
 
 	HAL_Delay(delay);
+	TIM2->CCR4 = 0;
+		TIM2 ->CCR3 = 0;
 }
 
-void rotate_left(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
+void rotate_left(uint32_t delay, uint32_t speed)
 {
 
-	TIM2->CCR4 = calculatePWM(Lspeed);
-	TIM2 ->CCR3 = calculatePWM(Rspeed);
+	TIM2->CCR4 = speed;
+	TIM2 ->CCR3 = speed;
 	//bwd
 	HAL_GPIO_WritePin(ML_FWD_GPIO_Port, ML_FWD_Pin, 1); // ml fwd high
 	HAL_GPIO_WritePin(ML_BWD_GPIO_Port, ML_BWD_Pin, 0);	//mlbwd low
@@ -224,28 +241,20 @@ void rotate_left(uint32_t delay, uint32_t Lspeed, uint32_t Rspeed)
 	HAL_GPIO_WritePin(MR_BWD_GPIO_Port, MR_BWD_Pin, 1);
 
 	HAL_Delay(delay);
+	TIM2->CCR4 = 0;
+	TIM2 ->CCR3 = 0;
 }
 
+void turn_right(uint32_t speed) {
+	//smooth turn
+	;
+}
 
+void turn_left(uint32_t speed) {;}
 
-
-
+// END API FUNCTIONS
 
 //functions to select and initialize adc CHANNELS
-
-//ADC for battery reading
-static void ADC1_Select_CH1(void){
-ADC_ChannelConfTypeDef sConfig = {0};
-		sConfig.Channel = ADC_CHANNEL_1;
-		sConfig.Rank = ADC_REGULAR_RANK_1;
-		sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
-		if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-		{
-			Error_Handler();
-		}
-	}
-
-
 static void ADC1_Select_CH4(void){
 ADC_ChannelConfTypeDef sConfig = {0};
 		sConfig.Channel = ADC_CHANNEL_4;
@@ -279,7 +288,6 @@ static void ADC1_Select_CH5(void){
 				Error_Handler();
 			}
 	}
-
 static void ADC1_Select_CH8(void){
 		ADC_ChannelConfTypeDef sConfig = {0};
 			sConfig.Channel = ADC_CHANNEL_8;
@@ -290,8 +298,6 @@ static void ADC1_Select_CH8(void){
 				Error_Handler();
 			}
 	}
-
-
 
 uint16_t measure_dist(dist_t dist){
 	GPIO_TypeDef* emitter_port;
@@ -339,15 +345,511 @@ uint16_t measure_dist(dist_t dist){
 	return adc_val;
 }
 
-uint16_t measure_battery_voltage(){
-		ADC1_Select_CH1();
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-		battery_volt_reading = HAL_ADC_GetValue(&hadc1); //raw ADC value for battery voltage
-		return battery_volt_reading;	//at 7.2V ADC value should be between 2400 and 4000
-		//7.22 is current voltage, R23 =10KOHM R22= 20KOHM, voltage at ADC should be 1/3 of battery voltage
+// FLOODFILL MAZE LOGIC START
+
+typedef struct Coord {
+    int x;
+    int y;
+}Coord;
+
+
+typedef enum Direction
+{
+    NORTH = 0,
+    EAST = 1,
+    SOUTH = 2,
+    WEST = 3
+}Direction;
+
+typedef enum DirectionBitmask
+{
+    NORTH_MASK = 0b1000,
+    EAST_MASK = 0b0100,
+    SOUTH_MASK = 0b0010,
+    WEST_MASK = 0b0001
+}DirectionBitmask;
+
+
+typedef struct Cell {
+    Coord pos;
+    Direction dir;
+    bool blocked;
+}Cell;
+
+typedef struct CellList {
+    int size;
+    Cell* cells;
+}CellList;
+
+typedef struct Maze{
+    Coord mousePos;
+    Direction mouseDir;
+
+    int distances[16][16];
+    bool exploredCells[16][16];
+    int cellWalls[16][16];
+    bool verticalWalls[16][17];
+    bool horizontalWalls[17][16];
+}Maze;
+
+_Bool _in_bounds(Coord c);
+CellList *getNeighborCells(Maze *m, Coord c);
+Cell getBestCell(Maze *m);
+
+void cw_step(Maze *m);
+void ccw_step(Maze *m);
+
+void setGoalCell(Maze *m);
+
+void updateSimulator(Maze m);
+void _reset_distances(Maze *m);
+void updatePos(Maze *m);
+
+void scanWalls(Maze *m);
+Direction dir(Maze *m);
+
+void floodfill(Maze *m, _Bool returning);
+
+// OPTIMIZE
+void init_walls(Maze *m)
+{
+    for (int i = 0; i < 16; ++i)
+    {
+        for (int j = 0; j < 16; ++j)
+        {
+            m->cellWalls[j][i] = 0;
+        }
+    }
+    for (int y = 0; y < 17; ++y)
+    {
+        for (int x = 0; x < 16; ++x)
+        {
+            m->verticalWalls[x][y] = false;
+            m->horizontalWalls[y][x] = false;
+            if (x == 0 && y != 16)
+            {
+                m->horizontalWalls[x][y] = true;
+                m->verticalWalls[y][x] = true;
+            }
+            else if (x == 15 && y != 16)
+            {
+                m->horizontalWalls[x+1][y] = true;
+                m->verticalWalls[y][x+1] = true;
+            }
+        }
+    }
 }
 
+
+bool _in_bounds(Coord c)
+{
+    return c.x >= 0 && c.x < 16 && c.y >= 0 && c.y < 16;
+}
+
+CellList *getNeighborCells(Maze *m, Coord c)
+{
+    CellList *neighbors = (CellList *)malloc(sizeof(CellList));
+    neighbors->size = 4;
+    neighbors->cells = (Cell *)malloc(neighbors->size * sizeof(Cell));
+
+    neighbors->cells[0] = (Cell){(Coord){c.x + 1, c.y}, EAST, m->horizontalWalls[c.x + 1][c.y] || !_in_bounds((Coord){c.x + 1, c.y})};
+    neighbors->cells[1] = (Cell){(Coord){c.x, c.y + 1}, NORTH, m->verticalWalls[c.x][c.y + 1] || !_in_bounds((Coord){c.x, c.y + 1})};
+    neighbors->cells[2] = (Cell){(Coord){c.x - 1, c.y}, WEST, m->horizontalWalls[c.x][c.y] || !_in_bounds((Coord){c.x - 1, c.y})};
+    neighbors->cells[3] = (Cell){(Coord){c.x, c.y - 1}, SOUTH, m->verticalWalls[c.x][c.y] || !_in_bounds((Coord){c.x, c.y - 1})};
+
+    return neighbors;
+}
+
+Cell getBestKnownCell(Maze *m)
+{
+	int mx = m->mousePos.x;
+	    int my = m->mousePos.y;
+	    int shortest = m->distances[mx][my];
+	    CellList *best_cells = getNeighborCells(m, m->mousePos);
+	    int b_size = best_cells->size;
+	    Cell best = (Cell){(Coord){255, 255}, NORTH, true};
+	    // first choice, explored and less than curr distance, cannot call on first run
+	    for (int i = 0; i < b_size; ++i)
+	    {
+	        int bx = best_cells->cells[i].pos.x;
+	        int by = best_cells->cells[i].pos.y;
+	        if (!best_cells->cells[i].blocked && m->distances[bx][by] < shortest)
+	        {
+	            best = best_cells->cells[i];
+	            shortest = m->distances[bx][by];
+	        }
+	    }
+	     if (best.blocked)
+	    {
+	        for (int i = 0; i < b_size; ++i)
+	        {
+
+	            int bx = best_cells->cells[i].pos.x;
+	            int by = best_cells->cells[i].pos.y;
+	            if (!best_cells->cells[i].blocked && m->distances[bx][by] <= shortest)
+	            {
+	                best = best_cells->cells[i];
+	                shortest = m->distances[bx][by];
+	            }
+	        }
+	    }
+	    if (best.blocked)
+	    {
+	        for (int i = 0; i < b_size; ++i)
+	        {
+
+	            int bx = best_cells->cells[i].pos.x;
+	            int by = best_cells->cells[i].pos.y;
+	            if (!best_cells->cells[i].blocked)
+	            {
+	                best = best_cells->cells[i];
+	                shortest = m->distances[bx][by];
+	            }
+	        }
+	    }
+	    free(best_cells->cells);
+	    free(best_cells);
+	    return best;
+}
+
+Cell getBestCell(Maze *m)
+{
+    int mx = m->mousePos.x;
+    int my = m->mousePos.y;
+    int shortest = m->distances[mx][my];
+    CellList *best_cells = getNeighborCells(m, m->mousePos);
+    int b_size = best_cells->size;
+    Cell best = {(Coord){255, 255}, NORTH, true};
+    // first choice, unexplored and less than curr distance
+    for (int i = 0; i < b_size; ++i)
+    {
+        int bx = best_cells->cells[i].pos.x;
+        int by = best_cells->cells[i].pos.y;
+        if (!best_cells->cells[i].blocked && ((!m->exploredCells[bx][by] && m->distances[bx][by] < shortest)))
+        {
+            best = best_cells->cells[i];
+            shortest = m->distances[bx][by];
+        }
+    }
+
+    // second choice, unexplored, less than or equal to
+    for (int i = 0; i < b_size; ++i)
+    {
+        int bx = best_cells->cells[i].pos.x;
+        int by = best_cells->cells[i].pos.y;
+        if (!best_cells->cells[i].blocked && ((!m->exploredCells[bx][by] && m->distances[bx][by] <= shortest)))
+        {
+            best = best_cells->cells[i];
+            shortest = m->distances[bx][by];
+        }
+    }
+    //2.5 choice unexplored
+    if (best.blocked)
+    {
+        for (int i = 0; i < b_size; ++i)
+        {
+
+            int bx = best_cells->cells[i].pos.x;
+            int by = best_cells->cells[i].pos.y;
+            if (!best_cells->cells[i].blocked && !m->exploredCells[bx][by])
+            {
+                best = best_cells->cells[i];
+                shortest = m->distances[bx][by];
+            }
+        }
+    }
+    // third choice, less than curr distance
+    if (best.blocked)
+    {
+        for (int i = 0; i < b_size; ++i)
+        {
+
+            int bx = best_cells->cells[i].pos.x;
+            int by = best_cells->cells[i].pos.y;
+            if (!best_cells->cells[i].blocked && m->distances[bx][by] < shortest)
+            {
+                best = best_cells->cells[i];
+                shortest = m->distances[bx][by];
+            }
+        }
+    }
+    // last choice, less than or equal to curr distance and explored
+    if (best.blocked)
+    {
+        for (int i = 0; i < b_size; ++i)
+        {
+
+            int bx = best_cells->cells[i].pos.x;
+            int by = best_cells->cells[i].pos.y;
+            if (!best_cells->cells[i].blocked && m->distances[bx][by] <= shortest)
+            {
+                best = best_cells->cells[i];
+                shortest = m->distances[bx][by];
+            }
+        }
+    }
+    if (best.blocked)
+    {
+        for (int i = 0; i < b_size; ++i)
+        {
+
+            int bx = best_cells->cells[i].pos.x;
+            int by = best_cells->cells[i].pos.y;
+            if (!best_cells->cells[i].blocked)
+            {
+                best = best_cells->cells[i];
+                shortest = m->distances[bx][by];
+            }
+        }
+    }
+    free(best_cells->cells);
+    free(best_cells);
+    return best;
+}
+
+void cw_step(Maze *m)
+{
+    rotate_right(1000, 1300);
+    m->mouseDir = (Direction)((m->mouseDir + 1) % 4);
+}
+
+void ccw_step(Maze *m)
+{
+    rotate_left(1000, 1300);
+    m->mouseDir = (Direction)((m->mouseDir + 3) % 4);
+}
+
+void setGoalCenter(Maze *m)
+{
+    m->distances[7][7] = 0;
+    m->distances[7][8] = 0;
+    m->distances[8][7] = 0;
+    m->distances[8][8] = 0;
+}
+
+// optimize:
+void scanWalls(Maze *m)
+{
+    // scan front
+    if (m->mouseDir == NORTH)
+    {
+        if (wallFront())
+        {
+            m->verticalWalls[m->mousePos.x][m->mousePos.y + 1] = true;
+        }
+        if (wallRight())
+        {
+            m->horizontalWalls[m->mousePos.x + 1][m->mousePos.y] = true;
+        }
+        if (wallLeft())
+        {
+            m->horizontalWalls[m->mousePos.x][m->mousePos.y] = true;
+        }
+    }
+    else if (m->mouseDir == EAST)
+    {
+        if (wallFront())
+        {
+            m->horizontalWalls[m->mousePos.x + 1][m->mousePos.y] = true;
+        }
+        if (wallRight())
+        {
+            m->verticalWalls[m->mousePos.x][m->mousePos.y] = true;
+        }
+        if (wallLeft())
+        {
+            m->verticalWalls[m->mousePos.x][m->mousePos.y + 1] = true;
+        }
+    }
+    else if (m->mouseDir == SOUTH)
+    {
+        if (wallFront())
+        {
+            m->verticalWalls[m->mousePos.x][m->mousePos.y] = true;
+        }
+        if (wallRight())
+        {
+            m->horizontalWalls[m->mousePos.x][m->mousePos.y] = true;
+        }
+        if (wallLeft())
+        {
+            m->horizontalWalls[m->mousePos.x + 1][m->mousePos.y] = true;
+        }
+    }
+    else if (m->mouseDir == WEST)
+    {
+        if (wallFront())
+        {
+            m->horizontalWalls[m->mousePos.x][m->mousePos.y] = true;
+        }
+        if (wallRight())
+        {
+            m->verticalWalls[m->mousePos.x][m->mousePos.y + 1] = true;
+        }
+        if (wallLeft())
+        {
+            m->verticalWalls[m->mousePos.x][m->mousePos.y] = true;
+        }
+    }
+}
+
+void updateWalls(Maze *m)
+{
+    for (int y = 0; y <= 16; ++y)
+    {
+        for (int x = 0; x < 16; ++x)
+        {
+            if (m->verticalWalls[x][y])
+            {
+                if (y == 0)
+                    m->cellWalls[x][y] = SOUTH_MASK;
+                else if (y == 16)
+                    m->cellWalls[x][y - 1] = NORTH_MASK;
+                else
+                {
+                    m->cellWalls[x][y] |= SOUTH_MASK;
+                    m->cellWalls[x][y - 1] |= NORTH_MASK;
+                }
+            }
+            if (m->horizontalWalls[y][x])
+            {
+                if (y == 0)
+                    m->cellWalls[y][x] |= WEST_MASK;
+                else if (y == 16)
+                    m->cellWalls[y - 1][x] |= EAST_MASK;
+                else
+                {
+                    m->cellWalls[y][x] |= WEST_MASK;
+                    m->cellWalls[y - 1][x] |= EAST_MASK;
+                }
+            }
+        }
+    }
+}
+
+void updatePos(Maze *m)
+{
+    move_fwd(1000, 1300, 1300);
+    m->exploredCells[m->mousePos.x][m->mousePos.y] = true;
+    //API::setColor(m->mousePos.x, m->mousePos.y, 'G');
+    if (m->mouseDir == NORTH)
+        m->mousePos.y++;
+    if (m->mouseDir == SOUTH)
+        m->mousePos.y--;
+    if (m->mouseDir == WEST)
+        m->mousePos.x--;
+    if (m->mouseDir == EAST)
+        m->mousePos.x++;
+
+}
+
+
+Direction dir(Maze *m)
+{
+    Direction d = m->mouseDir;
+    return d;
+}
+
+void floodfill(Maze *m, _Bool returning)
+{
+    Coord queue[255];
+    int h = 0, t = 0;
+    // set goal cell distances to 0
+    _reset_distances(m);
+    if (!returning) {
+        setGoalCenter(m);
+        queue[t] = (Coord){7, 7};
+        ++t;
+        queue[t] = (Coord){7, 8};
+        ++t;
+        queue[t] = (Coord){8, 7};
+        ++t;
+        queue[t] = (Coord){8, 8};
+        ++t;
+    }   else if (returning) {
+        m->distances[0][0] = 0;
+        queue[t] = (Coord){0,0};
+        ++t;
+    }
+
+    while (t - h > 0)
+    {
+        Coord cur_pos = queue[h];
+        ++h;
+        int newcost = m->distances[cur_pos.x][cur_pos.y] + 1;
+        CellList *neighbor = getNeighborCells(m, cur_pos);
+        int n_size = neighbor->size;
+        for (int i = 0; i < n_size; ++i)
+        {
+            if (!neighbor->cells[i].blocked)
+            {
+                if (m->distances[neighbor->cells[i].pos.x][neighbor->cells[i].pos.y] > newcost)
+                {
+                    m->distances[neighbor->cells[i].pos.x][neighbor->cells[i].pos.y] = newcost;
+                    queue[t] = (Coord){neighbor->cells[i].pos.x, neighbor->cells[i].pos.y};
+                    ++t;
+                }
+            }
+        }
+        free(neighbor->cells);
+        free(neighbor);
+    }
+}
+
+void _reset_distances(Maze *m)
+{
+    for (int i = 0; i < 16; ++i)
+    {
+        for (int j = 0; j < 16; ++j) m->distances[i][j] = MAXCOST;
+    }
+}
+
+
+void DFS(Maze *m, _Bool returning) {
+    floodfill(m, returning);
+    while (m->distances[m->mousePos.x][m->mousePos.y] != 0)
+    {
+        floodfill(m, returning);
+        scanWalls(m);
+        updateWalls(m);
+
+        Cell best = getBestCell(m);
+
+        if (best.dir == m->mouseDir);
+        else if (best.dir == (m->mouseDir + 3) % 4) ccw_step(m);
+        else if (best.dir == (m->mouseDir + 1) % 4) cw_step(m);
+        else
+        {
+            cw_step(m);
+            cw_step(m);
+        }
+        updatePos(m);
+    }
+}
+
+void quickestKnown(Maze *m, bool returning) {
+    floodfill(m, returning);
+    while (m->distances[m->mousePos.x][m->mousePos.y] != 0)
+    {
+        floodfill(m, returning);
+        scanWalls(m);
+        updateWalls(m);
+        Cell best = getBestCell(m);
+        if (best.dir == m->mouseDir) ;
+        else if (best.dir == (m->mouseDir + 3) % 4) ccw_step(m);
+        else if (best.dir == (m->mouseDir + 1) % 4) cw_step(m);
+        else
+        {
+            cw_step(m);
+            cw_step(m);
+        }
+
+        updatePos(m);
+    }
+}
+
+//
+//FLOODFILL MAZE LOGIC END
 
 /* USER CODE END 0 */
 
@@ -365,7 +867,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+                                HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -395,80 +897,44 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  Maze m = {};
+  m.mousePos = (Coord){0,0};
+  m.mouseDir = NORTH;
+      init_walls(&m);
 
   while (1)
   {
-	  battery_volt_analog = battery_volt_reading *(9/4096); //conversion factor for ADC reading to an analog voltage
 	  //calls to measure distance FR,FL,L,R can adjust delay in timing function to make the IR sensors more responsive
 	  dis_FR = measure_dist(DIST_FR);
 	  dis_FL = measure_dist(DIST_FL);
 	  dis_R = measure_dist(DIST_R);
 	  dis_L = measure_dist(DIST_L);
 
-	  battery_volt_analog = measure_battery_voltage();
-
-
 
 	  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET){ //code for reading a button input/output
-
-
-		  	  //move_fwd(5000,1000,1000);40
-		  	  //move_fwd(5000,1100,1100);50
-		  	  //move_fwd(5000,1200,1200);60
-		  	  //move_fwd(5000,1300,1300);70
-		  	  //move_fwd(5000,1400,1400);80
-		  	  //move_fwd(5000,1500,1500);90
-		  	  //move_fwd(5000,1600,1600);100
-		  	  //move_fwd(5000,1700,1700);120
-		  	  //move_fwd(5000,1800,1800);140
-		  	  //move_fwd(5000,1900,1900);160
-
-		  	  //if (speed_diff_left_cm == 0) move_fwd(1000, 1800, 1800);
-			  //if (speed_diff_left_cm > 0){
-				//  move_fwd(500, 0000, 1800);
-			  	  //move_fwd(1000, 1800, 1800);
-			  //}
-			  //else if (speed_diff_left_cm < 0) move_fwd(500, 2200, 1800);
-
-
+		  on = true;
 	  }
 
-	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_14) == GPIO_PIN_RESET){
 
-	 			  //move_bwd(1000);
+	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_14) == GPIO_PIN_RESET) on = false;
 
-	 		  }
-
-
-		  //rotate_right(1000);
-		  //rotate_left(1000);
-
-		 // move_bwd(1000);
-		  //HAL_Delay(500);
-		  //a = true;
-
-		  //HAL_Delay(500);
-		  //a = false;
-
-
-
-
-	  //avoid_front_wall();
-
-
-
-
-
-
-	  //rotate_right(2000);
-
-	  //rotate_left(4000);
-
-	  //rotate_right(3000);
-
-	  //move_fwd(2000);
-
-	  //move_bwd(2000);
+	  if (on) {
+		  /*
+	  		 DFS(&m, false);
+	  		 DFS(&m, true);
+	  		 DFS(&m, false);
+	  		 DFS(&m, true);
+	  		 */
+		  if (dis_FR > 100 || dis_FL > 100) {
+			  rotate_left(400, 1300);
+		  }
+		  else {
+			  move_fwd(100, 1300, 1300);
+		  }
+	  }
+	  else {
+		  //quickestKnown(&m, false);
+	  }
 
     /* USER CODE END WHILE */
 
